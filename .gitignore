@@ -30,3 +30,4 @@ input/*.json
 # ONNX output artifacts
 onnx_export/*.onnx
 !onnx_export/.gitkeep
+profiling*.json
