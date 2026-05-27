@@ -1,0 +1,44 @@
+name: Scheduled Kaggle Submit
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install onnx numpy kaggle
+
+      - name: Dry-run check
+        run: |
+          python .github/scripts/kaggle_submit.py \
+            --competition "neurogolf-2026" \
+            --registry .github/config/task_registry.json \
+            --message "Scheduled submission $(date -I)" \
+            --dry-run
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+
+      - name: Submit to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python .github/scripts/kaggle_submit.py \
+            --competition "neurogolf-2026" \
+            --registry .github/config/task_registry.json \
+            --message "Scheduled submission $(date -I)"

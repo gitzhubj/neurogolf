@@ -1,0 +1,83 @@
+name: PR Validate & Cost Check
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'networks/**'
+      - 'onnx_export/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      passed: ${{ steps.validate.outputs.passed }}
+      improved: ${{ steps.compare.outputs.improved }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install onnx onnxruntime numpy
+
+      - name: Detect changed ONNX files
+        id: changed
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD -- onnx_export/*.onnx 2>/dev/null || echo "")
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+          if [ -z "$CHANGED" ]; then
+            echo "count=0" >> $GITHUB_OUTPUT
+          else
+            echo "count=$(echo "$CHANGED" | wc -l)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate ONNX files
+        id: validate
+        if: steps.changed.outputs.count > 0
+        run: |
+          FAILED=0
+          for f in ${{ steps.changed.outputs.files }}; do
+            echo "--- Validating $f ---"
+            python .github/scripts/validate_onnx.py "$f" || FAILED=1
+          done
+          if [ $FAILED -eq 0 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Compute cost & compare
+        id: compare
+        if: steps.validate.outputs.passed == 'true'
+        run: |
+          python .github/scripts/compare_cost.py \
+            --registry .github/config/task_registry.json \
+            --changed "${{ steps.changed.outputs.files }}" \
+            --output report.md || true
+          echo "improved=$(cat improved.txt 2>/dev/null || echo false)" >> $GITHUB_OUTPUT
+
+      - name: Post PR comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.existsSync('report.md')
+              ? fs.readFileSync('report.md', 'utf8')
+              : '## PR 验证结果\n\n未检测到 ONNX 文件变更，或验证流程未执行。';
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: report
+            });

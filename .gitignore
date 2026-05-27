@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# ONNX runtime artifacts
+*.onnx.data
+
+# Kaggle
+kaggle.json
+*.kaggle/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test data (large files, in input/)
+input/*.json
+!input/.gitkeep
+
+# Lock files
+.locks/
+
+# ONNX output artifacts
+onnx_export/*.onnx
+!onnx_export/.gitkeep

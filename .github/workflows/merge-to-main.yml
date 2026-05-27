@@ -1,0 +1,64 @@
+name: Merge → Registry → Kaggle Submit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'onnx_export/**'
+
+permissions:
+  contents: write
+
+jobs:
+  update-submit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install onnx onnxruntime numpy kaggle
+
+      - name: Detect merged ONNX files
+        id: changed
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1..HEAD -- onnx_export/*.onnx 2>/dev/null || echo "")
+          echo "files=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Update task registry
+        if: steps.changed.outputs.files != ''
+        run: |
+          python .github/scripts/update_registry.py \
+            --registry .github/config/task_registry.json \
+            --files "${{ steps.changed.outputs.files }}" \
+            --commit "${{ github.sha }}" \
+            --author "${{ github.actor }}"
+
+      - name: Commit registry update
+        if: steps.changed.outputs.files != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/config/task_registry.json
+          if ! git diff --staged --quiet; then
+            git commit -m "chore: update task registry [skip ci]"
+            git push
+          fi
+
+      - name: Package & submit to Kaggle
+        if: steps.changed.outputs.files != ''
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          python .github/scripts/kaggle_submit.py \
+            --competition "neurogolf-2026"  <!-- slug 已确认 --> \
+            --registry .github/config/task_registry.json \
+            --message "auto: $(git log -1 --pretty=%s)"
