@@ -29,7 +29,7 @@ jobs:
       - name: Detect merged ONNX files
         id: changed
         run: |
-          CHANGED=$(git diff --name-only HEAD~1..HEAD -- onnx_export/*.onnx 2>/dev/null || echo "")
+          CHANGED=$(git diff --name-only HEAD~1..HEAD -- onnx_export/*.onnx 2>/dev/null | tr '\n' ' ' || echo "")
           echo "files=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: Update task registry
