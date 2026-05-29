@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'onnx_export/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -59,6 +60,6 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
           python .github/scripts/kaggle_submit.py \
-            --competition "neurogolf-2026"  <!-- slug 已确认 --> \
+            --competition "neurogolf-2026" \
             --registry .github/config/task_registry.json \
             --message "auto: $(git log -1 --pretty=%s)"
