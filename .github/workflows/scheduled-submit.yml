@@ -20,7 +20,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install onnx numpy kaggle
+        run: pip install onnx numpy "kaggle<2"
 
       - name: Dry-run check
         run: |

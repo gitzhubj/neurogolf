@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install onnx onnxruntime numpy kaggle
+        run: pip install onnx onnxruntime numpy "kaggle<2"
 
       - name: Detect merged ONNX files
         id: changed
