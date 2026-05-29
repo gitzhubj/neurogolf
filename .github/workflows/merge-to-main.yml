@@ -24,7 +24,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install onnx onnxruntime numpy "kaggle<2"
+        run: pip install onnx onnxruntime numpy kaggle
 
       - name: Detect merged ONNX files
         id: changed
@@ -55,8 +55,7 @@ jobs:
       - name: Package & submit to Kaggle
         if: steps.changed.outputs.files != ''
         env:
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
         run: |
           python .github/scripts/kaggle_submit.py \
             --competition "neurogolf-2026" \

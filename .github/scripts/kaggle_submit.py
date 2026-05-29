@@ -13,18 +13,17 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def setup_kaggle_credentials():
-    """Create ~/.kaggle/kaggle.json from environment variables."""
-    username = os.environ.get('KAGGLE_USERNAME', '')
-    key = os.environ.get('KAGGLE_KEY', '')
-    if not username or not key:
+    """Create ~/.kaggle/access_token from KAGGLE_API_TOKEN env var."""
+    token = os.environ.get('KAGGLE_API_TOKEN', '')
+    if not token:
         return False
 
     kaggle_dir = Path.home() / '.kaggle'
     kaggle_dir.mkdir(parents=True, exist_ok=True)
-    creds = {'username': username, 'key': key}
-    with open(kaggle_dir / 'kaggle.json', 'w') as f:
-        json.dump(creds, f)
-    (kaggle_dir / 'kaggle.json').chmod(0o600)
+    with open(kaggle_dir / 'access_token', 'w') as f:
+        f.write(token)
+    (kaggle_dir / 'access_token').chmod(0o600)
+    print("Kaggle credentials configured.")
     return True
 
 
