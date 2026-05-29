@@ -1,6 +1,7 @@
 """打包 ONNX 文件并通过 Kaggle API 提交"""
 import sys
 import json
+import os
 import argparse
 import subprocess
 import tempfile
@@ -11,6 +12,22 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
+def setup_kaggle_credentials():
+    """Create ~/.kaggle/kaggle.json from environment variables."""
+    username = os.environ.get('KAGGLE_USERNAME', '')
+    key = os.environ.get('KAGGLE_KEY', '')
+    if not username or not key:
+        return False
+
+    kaggle_dir = Path.home() / '.kaggle'
+    kaggle_dir.mkdir(parents=True, exist_ok=True)
+    creds = {'username': username, 'key': key}
+    with open(kaggle_dir / 'kaggle.json', 'w') as f:
+        json.dump(creds, f)
+    (kaggle_dir / 'kaggle.json').chmod(0o600)
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--competition', required=True)
@@ -18,6 +35,11 @@ def main():
     parser.add_argument('--message', default='Automated submission')
     parser.add_argument('--dry-run', action='store_true')
     args = parser.parse_args()
+
+    # Set up Kaggle credentials file
+    if not setup_kaggle_credentials():
+        print("ERROR: KAGGLE_USERNAME and KAGGLE_KEY environment variables not set.")
+        sys.exit(1)
 
     with open(args.registry) as f:
         registry = json.load(f)
