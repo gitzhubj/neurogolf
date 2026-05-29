@@ -1,5 +1,24 @@
 {
-  "version": "0.1",
-  "updated": "2026-05-27T00:00:00Z",
-  "tasks": {}
+  "version": "0.2",
+  "updated": "2026-05-29T00:00:00Z",
+  "tasks": {
+    "016": {
+      "onnx_file": "task016.onnx",
+      "params": 100,
+      "memory_bytes": 36400,
+      "cost": 36500,
+      "points": 20.395,
+      "pass_rate": "267/267",
+      "architecture": "single_1x1_conv"
+    },
+    "053": {
+      "onnx_file": "task053.onnx",
+      "params": 900,
+      "memory_bytes": 144000,
+      "cost": 144900,
+      "points": 12.999,
+      "pass_rate": "267/267",
+      "architecture": "conv_add_mul_shift"
+    }
+  }
 }

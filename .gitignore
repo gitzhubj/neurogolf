@@ -31,3 +31,4 @@ input/*.json
 onnx_export/*.onnx
 !onnx_export/.gitkeep
 profiling*.json
+*_202?-*-*.json
