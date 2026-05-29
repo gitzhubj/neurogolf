@@ -54,7 +54,6 @@ jobs:
           fi
 
       - name: Package & submit to Kaggle
-        if: steps.changed.outputs.files != ''
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
