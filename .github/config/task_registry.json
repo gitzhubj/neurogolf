@@ -1,6 +1,6 @@
 {
   "version": "0.2",
-  "updated": "2026-05-29T09:30:35.786560+00:00",
+  "updated": "2026-05-29T10:35:53.998528+00:00",
   "tasks": {
     "016": {
       "cost": 500,
@@ -20,6 +20,16 @@
       "onnx_size_bytes": 39884,
       "last_updated": "2026-05-29T09:11:01.000126+00:00",
       "commit": "a9a4ce4be529f42f965e843a4024266a7b9c8892",
+      "author": "gitzhubj"
+    },
+    "015": {
+      "cost": 4500,
+      "params": 900,
+      "memory_bytes": 3600,
+      "onnx_file": "task015.onnx",
+      "onnx_size_bytes": 3772,
+      "last_updated": "2026-05-29T10:35:53.998495+00:00",
+      "commit": "543c07d121ca9aa38851831af42fb136fa186da5",
       "author": "gitzhubj"
     }
   }
