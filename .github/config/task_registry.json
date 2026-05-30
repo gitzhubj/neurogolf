@@ -1,25 +1,25 @@
 {
   "version": "0.2",
-  "updated": "2026-05-30T07:45:55.480441+00:00",
+  "updated": "2026-05-30T08:05:55.374057+00:00",
   "tasks": {
     "016": {
-      "cost": 500,
-      "params": 100,
-      "memory_bytes": 400,
+      "cost": 50,
+      "params": 10,
+      "memory_bytes": 40,
       "onnx_file": "task016.onnx",
-      "onnx_size_bytes": 586,
-      "last_updated": "2026-05-29T09:30:35.786533+00:00",
-      "commit": "01f5b97e944f39baaf29eb751bece4c6ccbc2fe7",
+      "onnx_size_bytes": 181,
+      "last_updated": "2026-05-30T08:05:54.770967+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
       "author": "gitzhubj"
     },
     "053": {
-      "cost": 76500,
-      "params": 900,
-      "memory_bytes": 75600,
+      "cost": 150,
+      "params": 30,
+      "memory_bytes": 120,
       "onnx_file": "task053.onnx",
-      "onnx_size_bytes": 39884,
-      "last_updated": "2026-05-29T09:11:01.000126+00:00",
-      "commit": "a9a4ce4be529f42f965e843a4024266a7b9c8892",
+      "onnx_size_bytes": 205,
+      "last_updated": "2026-05-30T08:05:54.955998+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
       "author": "gitzhubj"
     },
     "015": {
@@ -40,6 +40,1966 @@
       "onnx_size_bytes": 1433,
       "last_updated": "2026-05-30T07:45:55.480412+00:00",
       "commit": "fc79155eb9fd45dc37abe86d9f572e92ecca49c9",
+      "author": "gitzhubj"
+    },
+    "002": {
+      "cost": 216065,
+      "params": 493,
+      "memory_bytes": 215572,
+      "onnx_file": "task002.onnx",
+      "onnx_size_bytes": 15528,
+      "last_updated": "2026-05-30T08:05:54.758301+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "003": {
+      "cost": 10082,
+      "params": 10,
+      "memory_bytes": 10072,
+      "onnx_file": "task003.onnx",
+      "onnx_size_bytes": 4189,
+      "last_updated": "2026-05-30T08:05:54.759120+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "004": {
+      "cost": 113100,
+      "params": 1020,
+      "memory_bytes": 112080,
+      "onnx_file": "task004.onnx",
+      "onnx_size_bytes": 2544,
+      "last_updated": "2026-05-30T08:05:54.759413+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "005": {
+      "cost": 238120,
+      "params": 336,
+      "memory_bytes": 237784,
+      "onnx_file": "task005.onnx",
+      "onnx_size_bytes": 10932,
+      "last_updated": "2026-05-30T08:05:54.761211+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "006": {
+      "cost": 2107,
+      "params": 47,
+      "memory_bytes": 2060,
+      "onnx_file": "task006.onnx",
+      "onnx_size_bytes": 1386,
+      "last_updated": "2026-05-30T08:05:54.761615+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "007": {
+      "cost": 7695,
+      "params": 31,
+      "memory_bytes": 7664,
+      "onnx_file": "task007.onnx",
+      "onnx_size_bytes": 1625,
+      "last_updated": "2026-05-30T08:05:54.762081+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "008": {
+      "cost": 38425,
+      "params": 61,
+      "memory_bytes": 38364,
+      "onnx_file": "task008.onnx",
+      "onnx_size_bytes": 7689,
+      "last_updated": "2026-05-30T08:05:54.763388+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "009": {
+      "cost": 188405,
+      "params": 3841,
+      "memory_bytes": 184564,
+      "onnx_file": "task009.onnx",
+      "onnx_size_bytes": 30978,
+      "last_updated": "2026-05-30T08:05:54.763948+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "010": {
+      "cost": 9801,
+      "params": 77,
+      "memory_bytes": 9724,
+      "onnx_file": "task010.onnx",
+      "onnx_size_bytes": 6083,
+      "last_updated": "2026-05-30T08:05:54.765079+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "011": {
+      "cost": 139487,
+      "params": 2331,
+      "memory_bytes": 137156,
+      "onnx_file": "task011.onnx",
+      "onnx_size_bytes": 10192,
+      "last_updated": "2026-05-30T08:05:54.766168+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "012": {
+      "cost": 23550,
+      "params": 102,
+      "memory_bytes": 23448,
+      "onnx_file": "task012.onnx",
+      "onnx_size_bytes": 1970,
+      "last_updated": "2026-05-30T08:05:54.766665+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "013": {
+      "cost": 300537,
+      "params": 2257,
+      "memory_bytes": 298280,
+      "onnx_file": "task013.onnx",
+      "onnx_size_bytes": 18406,
+      "last_updated": "2026-05-30T08:05:54.768378+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "014": {
+      "cost": 244140,
+      "params": 0,
+      "memory_bytes": 244140,
+      "onnx_file": "task014.onnx",
+      "onnx_size_bytes": 14379,
+      "last_updated": "2026-05-30T08:05:54.770625+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "017": {
+      "cost": 124775,
+      "params": 623,
+      "memory_bytes": 124152,
+      "onnx_file": "task017.onnx",
+      "onnx_size_bytes": 8642,
+      "last_updated": "2026-05-30T08:05:54.772256+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "018": {
+      "cost": 1665299,
+      "params": 999,
+      "memory_bytes": 1664300,
+      "onnx_file": "task018.onnx",
+      "onnx_size_bytes": 32179,
+      "last_updated": "2026-05-30T08:05:54.775644+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "019": {
+      "cost": 286604,
+      "params": 1828,
+      "memory_bytes": 284776,
+      "onnx_file": "task019.onnx",
+      "onnx_size_bytes": 17909,
+      "last_updated": "2026-05-30T08:05:54.776445+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "020": {
+      "cost": 205614,
+      "params": 270,
+      "memory_bytes": 205344,
+      "onnx_file": "task020.onnx",
+      "onnx_size_bytes": 31400,
+      "last_updated": "2026-05-30T08:05:54.779918+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "021": {
+      "cost": 112252,
+      "params": 1860,
+      "memory_bytes": 110392,
+      "onnx_file": "task021.onnx",
+      "onnx_size_bytes": 38223,
+      "last_updated": "2026-05-30T08:05:54.782929+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "022": {
+      "cost": 132853,
+      "params": 121,
+      "memory_bytes": 132732,
+      "onnx_file": "task022.onnx",
+      "onnx_size_bytes": 43917,
+      "last_updated": "2026-05-30T08:05:54.787893+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "023": {
+      "cost": 1418505,
+      "params": 21,
+      "memory_bytes": 1418484,
+      "onnx_file": "task023.onnx",
+      "onnx_size_bytes": 20185,
+      "last_updated": "2026-05-30T08:05:54.792665+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "024": {
+      "cost": 25240,
+      "params": 260,
+      "memory_bytes": 24980,
+      "onnx_file": "task024.onnx",
+      "onnx_size_bytes": 3255,
+      "last_updated": "2026-05-30T08:05:54.793295+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "025": {
+      "cost": 12230445,
+      "params": 65193,
+      "memory_bytes": 12165252,
+      "onnx_file": "task025.onnx",
+      "onnx_size_bytes": 826774,
+      "last_updated": "2026-05-30T08:05:54.923035+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "026": {
+      "cost": 1380,
+      "params": 48,
+      "memory_bytes": 1332,
+      "onnx_file": "task026.onnx",
+      "onnx_size_bytes": 1644,
+      "last_updated": "2026-05-30T08:05:54.923606+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "027": {
+      "cost": 85070,
+      "params": 7218,
+      "memory_bytes": 77852,
+      "onnx_file": "task027.onnx",
+      "onnx_size_bytes": 31157,
+      "last_updated": "2026-05-30T08:05:54.924230+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "028": {
+      "cost": 243210,
+      "params": 12610,
+      "memory_bytes": 230600,
+      "onnx_file": "task028.onnx",
+      "onnx_size_bytes": 51240,
+      "last_updated": "2026-05-30T08:05:54.924606+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "029": {
+      "cost": 194018,
+      "params": 170,
+      "memory_bytes": 193848,
+      "onnx_file": "task029.onnx",
+      "onnx_size_bytes": 13611,
+      "last_updated": "2026-05-30T08:05:54.926023+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "030": {
+      "cost": 66111,
+      "params": 975,
+      "memory_bytes": 65136,
+      "onnx_file": "task030.onnx",
+      "onnx_size_bytes": 9463,
+      "last_updated": "2026-05-30T08:05:54.926960+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "031": {
+      "cost": 19166,
+      "params": 58,
+      "memory_bytes": 19108,
+      "onnx_file": "task031.onnx",
+      "onnx_size_bytes": 3439,
+      "last_updated": "2026-05-30T08:05:54.927563+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "032": {
+      "cost": 4869,
+      "params": 69,
+      "memory_bytes": 4800,
+      "onnx_file": "task032.onnx",
+      "onnx_size_bytes": 2369,
+      "last_updated": "2026-05-30T08:05:54.928081+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "033": {
+      "cost": 130289,
+      "params": 49,
+      "memory_bytes": 130240,
+      "onnx_file": "task033.onnx",
+      "onnx_size_bytes": 1530,
+      "last_updated": "2026-05-30T08:05:54.928529+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "034": {
+      "cost": 310843,
+      "params": 2847,
+      "memory_bytes": 307996,
+      "onnx_file": "task034.onnx",
+      "onnx_size_bytes": 11315,
+      "last_updated": "2026-05-30T08:05:54.929873+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "035": {
+      "cost": 46181,
+      "params": 225,
+      "memory_bytes": 45956,
+      "onnx_file": "task035.onnx",
+      "onnx_size_bytes": 12891,
+      "last_updated": "2026-05-30T08:05:54.931716+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "036": {
+      "cost": 157991,
+      "params": 159,
+      "memory_bytes": 157832,
+      "onnx_file": "task036.onnx",
+      "onnx_size_bytes": 5888,
+      "last_updated": "2026-05-30T08:05:54.932671+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "037": {
+      "cost": 152430,
+      "params": 8326,
+      "memory_bytes": 144104,
+      "onnx_file": "task037.onnx",
+      "onnx_size_bytes": 20446,
+      "last_updated": "2026-05-30T08:05:54.933390+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "038": {
+      "cost": 2501,
+      "params": 77,
+      "memory_bytes": 2424,
+      "onnx_file": "task038.onnx",
+      "onnx_size_bytes": 2379,
+      "last_updated": "2026-05-30T08:05:54.933863+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "039": {
+      "cost": 7972,
+      "params": 28,
+      "memory_bytes": 7944,
+      "onnx_file": "task039.onnx",
+      "onnx_size_bytes": 1935,
+      "last_updated": "2026-05-30T08:05:54.934313+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "040": {
+      "cost": 14634,
+      "params": 62,
+      "memory_bytes": 14572,
+      "onnx_file": "task040.onnx",
+      "onnx_size_bytes": 4126,
+      "last_updated": "2026-05-30T08:05:54.935101+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "041": {
+      "cost": 32935,
+      "params": 27,
+      "memory_bytes": 32908,
+      "onnx_file": "task041.onnx",
+      "onnx_size_bytes": 2250,
+      "last_updated": "2026-05-30T08:05:54.935589+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "042": {
+      "cost": 34024,
+      "params": 160,
+      "memory_bytes": 33864,
+      "onnx_file": "task042.onnx",
+      "onnx_size_bytes": 8420,
+      "last_updated": "2026-05-30T08:05:54.936671+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "043": {
+      "cost": 13975,
+      "params": 139,
+      "memory_bytes": 13836,
+      "onnx_file": "task043.onnx",
+      "onnx_size_bytes": 1988,
+      "last_updated": "2026-05-30T08:05:54.937110+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "044": {
+      "cost": 4696139,
+      "params": 1415,
+      "memory_bytes": 4694724,
+      "onnx_file": "task044.onnx",
+      "onnx_size_bytes": 148706,
+      "last_updated": "2026-05-30T08:05:54.949995+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "045": {
+      "cost": 14240,
+      "params": 32,
+      "memory_bytes": 14208,
+      "onnx_file": "task045.onnx",
+      "onnx_size_bytes": 1460,
+      "last_updated": "2026-05-30T08:05:54.950450+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "046": {
+      "cost": 61170,
+      "params": 866,
+      "memory_bytes": 60304,
+      "onnx_file": "task046.onnx",
+      "onnx_size_bytes": 8985,
+      "last_updated": "2026-05-30T08:05:54.951743+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "047": {
+      "cost": 10839,
+      "params": 127,
+      "memory_bytes": 10712,
+      "onnx_file": "task047.onnx",
+      "onnx_size_bytes": 3268,
+      "last_updated": "2026-05-30T08:05:54.952394+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "048": {
+      "cost": 11394,
+      "params": 66,
+      "memory_bytes": 11328,
+      "onnx_file": "task048.onnx",
+      "onnx_size_bytes": 5717,
+      "last_updated": "2026-05-30T08:05:54.953298+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "049": {
+      "cost": 95394,
+      "params": 150,
+      "memory_bytes": 95244,
+      "onnx_file": "task049.onnx",
+      "onnx_size_bytes": 3538,
+      "last_updated": "2026-05-30T08:05:54.953937+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "050": {
+      "cost": 25550,
+      "params": 250,
+      "memory_bytes": 25300,
+      "onnx_file": "task050.onnx",
+      "onnx_size_bytes": 2562,
+      "last_updated": "2026-05-30T08:05:54.954443+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "051": {
+      "cost": 121371,
+      "params": 79,
+      "memory_bytes": 121292,
+      "onnx_file": "task051.onnx",
+      "onnx_size_bytes": 3387,
+      "last_updated": "2026-05-30T08:05:54.955432+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "052": {
+      "cost": 1871,
+      "params": 43,
+      "memory_bytes": 1828,
+      "onnx_file": "task052.onnx",
+      "onnx_size_bytes": 1299,
+      "last_updated": "2026-05-30T08:05:54.955820+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "054": {
+      "cost": 382601,
+      "params": 161,
+      "memory_bytes": 382440,
+      "onnx_file": "task054.onnx",
+      "onnx_size_bytes": 9748,
+      "last_updated": "2026-05-30T08:05:54.957767+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "055": {
+      "cost": 42162,
+      "params": 994,
+      "memory_bytes": 41168,
+      "onnx_file": "task055.onnx",
+      "onnx_size_bytes": 21480,
+      "last_updated": "2026-05-30T08:05:54.960223+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "056": {
+      "cost": 956,
+      "params": 100,
+      "memory_bytes": 856,
+      "onnx_file": "task056.onnx",
+      "onnx_size_bytes": 1537,
+      "last_updated": "2026-05-30T08:05:54.960568+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "057": {
+      "cost": 150087,
+      "params": 11,
+      "memory_bytes": 150076,
+      "onnx_file": "task057.onnx",
+      "onnx_size_bytes": 1900,
+      "last_updated": "2026-05-30T08:05:54.961041+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "058": {
+      "cost": 61121,
+      "params": 6445,
+      "memory_bytes": 54676,
+      "onnx_file": "task058.onnx",
+      "onnx_size_bytes": 27461,
+      "last_updated": "2026-05-30T08:05:54.961500+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "059": {
+      "cost": 38857,
+      "params": 2553,
+      "memory_bytes": 36304,
+      "onnx_file": "task059.onnx",
+      "onnx_size_bytes": 12737,
+      "last_updated": "2026-05-30T08:05:54.962109+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "060": {
+      "cost": 10825,
+      "params": 181,
+      "memory_bytes": 10644,
+      "onnx_file": "task060.onnx",
+      "onnx_size_bytes": 3061,
+      "last_updated": "2026-05-30T08:05:54.962616+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "061": {
+      "cost": 31972,
+      "params": 1972,
+      "memory_bytes": 30000,
+      "onnx_file": "task061.onnx",
+      "onnx_size_bytes": 17052,
+      "last_updated": "2026-05-30T08:05:54.963016+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "062": {
+      "cost": 51205,
+      "params": 929,
+      "memory_bytes": 50276,
+      "onnx_file": "task062.onnx",
+      "onnx_size_bytes": 22146,
+      "last_updated": "2026-05-30T08:05:54.965742+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "063": {
+      "cost": 30860,
+      "params": 32,
+      "memory_bytes": 30828,
+      "onnx_file": "task063.onnx",
+      "onnx_size_bytes": 3731,
+      "last_updated": "2026-05-30T08:05:54.966460+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "064": {
+      "cost": 301230,
+      "params": 238,
+      "memory_bytes": 300992,
+      "onnx_file": "task064.onnx",
+      "onnx_size_bytes": 5831,
+      "last_updated": "2026-05-30T08:05:54.967445+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "065": {
+      "cost": 51577,
+      "params": 77,
+      "memory_bytes": 51500,
+      "onnx_file": "task065.onnx",
+      "onnx_size_bytes": 2725,
+      "last_updated": "2026-05-30T08:05:54.968189+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "066": {
+      "cost": 920672,
+      "params": 116,
+      "memory_bytes": 920556,
+      "onnx_file": "task066.onnx",
+      "onnx_size_bytes": 180195,
+      "last_updated": "2026-05-30T08:05:54.985196+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "067": {
+      "cost": 537,
+      "params": 33,
+      "memory_bytes": 504,
+      "onnx_file": "task067.onnx",
+      "onnx_size_bytes": 914,
+      "last_updated": "2026-05-30T08:05:54.985551+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "068": {
+      "cost": 18059,
+      "params": 27,
+      "memory_bytes": 18032,
+      "onnx_file": "task068.onnx",
+      "onnx_size_bytes": 2357,
+      "last_updated": "2026-05-30T08:05:54.986135+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "069": {
+      "cost": 165552,
+      "params": 2312,
+      "memory_bytes": 163240,
+      "onnx_file": "task069.onnx",
+      "onnx_size_bytes": 32350,
+      "last_updated": "2026-05-30T08:05:54.991253+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "070": {
+      "cost": 133830,
+      "params": 78,
+      "memory_bytes": 133752,
+      "onnx_file": "task070.onnx",
+      "onnx_size_bytes": 11866,
+      "last_updated": "2026-05-30T08:05:54.992608+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "071": {
+      "cost": 262710,
+      "params": 930,
+      "memory_bytes": 261780,
+      "onnx_file": "task071.onnx",
+      "onnx_size_bytes": 12104,
+      "last_updated": "2026-05-30T08:05:54.993568+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "072": {
+      "cost": 2430,
+      "params": 78,
+      "memory_bytes": 2352,
+      "onnx_file": "task072.onnx",
+      "onnx_size_bytes": 1647,
+      "last_updated": "2026-05-30T08:05:54.994278+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "073": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task073.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:54.994467+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "074": {
+      "cost": 62145,
+      "params": 45,
+      "memory_bytes": 62100,
+      "onnx_file": "task074.onnx",
+      "onnx_size_bytes": 1846,
+      "last_updated": "2026-05-30T08:05:54.994997+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "075": {
+      "cost": 52897,
+      "params": 57,
+      "memory_bytes": 52840,
+      "onnx_file": "task075.onnx",
+      "onnx_size_bytes": 7758,
+      "last_updated": "2026-05-30T08:05:54.996491+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "076": {
+      "cost": 3194746,
+      "params": 229498,
+      "memory_bytes": 2965248,
+      "onnx_file": "task076.onnx",
+      "onnx_size_bytes": 948894,
+      "last_updated": "2026-05-30T08:05:55.000503+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "077": {
+      "cost": 702745,
+      "params": 2213,
+      "memory_bytes": 700532,
+      "onnx_file": "task077.onnx",
+      "onnx_size_bytes": 9882,
+      "last_updated": "2026-05-30T08:05:55.001767+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "078": {
+      "cost": 15900,
+      "params": 36,
+      "memory_bytes": 15864,
+      "onnx_file": "task078.onnx",
+      "onnx_size_bytes": 2610,
+      "last_updated": "2026-05-30T08:05:55.002333+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "079": {
+      "cost": 29785,
+      "params": 245,
+      "memory_bytes": 29540,
+      "onnx_file": "task079.onnx",
+      "onnx_size_bytes": 2715,
+      "last_updated": "2026-05-30T08:05:55.002844+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "080": {
+      "cost": 354229,
+      "params": 1493,
+      "memory_bytes": 352736,
+      "onnx_file": "task080.onnx",
+      "onnx_size_bytes": 18506,
+      "last_updated": "2026-05-30T08:05:55.004446+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "081": {
+      "cost": 8749,
+      "params": 109,
+      "memory_bytes": 8640,
+      "onnx_file": "task081.onnx",
+      "onnx_size_bytes": 3771,
+      "last_updated": "2026-05-30T08:05:55.005293+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "082": {
+      "cost": 42635,
+      "params": 79,
+      "memory_bytes": 42556,
+      "onnx_file": "task082.onnx",
+      "onnx_size_bytes": 2304,
+      "last_updated": "2026-05-30T08:05:55.005799+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "083": {
+      "cost": 9000,
+      "params": 1800,
+      "memory_bytes": 7200,
+      "onnx_file": "task083.onnx",
+      "onnx_size_bytes": 7476,
+      "last_updated": "2026-05-30T08:05:55.006010+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "084": {
+      "cost": 5460622,
+      "params": 278194,
+      "memory_bytes": 5182428,
+      "onnx_file": "task084.onnx",
+      "onnx_size_bytes": 1127821,
+      "last_updated": "2026-05-30T08:05:55.010715+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "085": {
+      "cost": 226770,
+      "params": 138,
+      "memory_bytes": 226632,
+      "onnx_file": "task085.onnx",
+      "onnx_size_bytes": 2569,
+      "last_updated": "2026-05-30T08:05:55.011312+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "086": {
+      "cost": 39717,
+      "params": 225,
+      "memory_bytes": 39492,
+      "onnx_file": "task086.onnx",
+      "onnx_size_bytes": 4749,
+      "last_updated": "2026-05-30T08:05:55.012250+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "087": {
+      "cost": 440,
+      "params": 16,
+      "memory_bytes": 424,
+      "onnx_file": "task087.onnx",
+      "onnx_size_bytes": 312,
+      "last_updated": "2026-05-30T08:05:55.012477+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "088": {
+      "cost": 209948,
+      "params": 1252,
+      "memory_bytes": 208696,
+      "onnx_file": "task088.onnx",
+      "onnx_size_bytes": 15002,
+      "last_updated": "2026-05-30T08:05:55.013527+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "089": {
+      "cost": 98691,
+      "params": 99,
+      "memory_bytes": 98592,
+      "onnx_file": "task089.onnx",
+      "onnx_size_bytes": 17814,
+      "last_updated": "2026-05-30T08:05:55.016216+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "090": {
+      "cost": 127020,
+      "params": 104,
+      "memory_bytes": 126916,
+      "onnx_file": "task090.onnx",
+      "onnx_size_bytes": 19682,
+      "last_updated": "2026-05-30T08:05:55.019786+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "091": {
+      "cost": 158259,
+      "params": 107,
+      "memory_bytes": 158152,
+      "onnx_file": "task091.onnx",
+      "onnx_size_bytes": 4649,
+      "last_updated": "2026-05-30T08:05:55.020587+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "092": {
+      "cost": 435250,
+      "params": 26,
+      "memory_bytes": 435224,
+      "onnx_file": "task092.onnx",
+      "onnx_size_bytes": 4321,
+      "last_updated": "2026-05-30T08:05:55.021418+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "093": {
+      "cost": 50171,
+      "params": 111,
+      "memory_bytes": 50060,
+      "onnx_file": "task093.onnx",
+      "onnx_size_bytes": 5437,
+      "last_updated": "2026-05-30T08:05:55.022376+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "094": {
+      "cost": 48510,
+      "params": 90,
+      "memory_bytes": 48420,
+      "onnx_file": "task094.onnx",
+      "onnx_size_bytes": 3789,
+      "last_updated": "2026-05-30T08:05:55.023190+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "095": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task095.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:55.023371+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "096": {
+      "cost": 810810,
+      "params": 2126,
+      "memory_bytes": 808684,
+      "onnx_file": "task096.onnx",
+      "onnx_size_bytes": 64274,
+      "last_updated": "2026-05-30T08:05:55.029025+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "097": {
+      "cost": 199010,
+      "params": 922,
+      "memory_bytes": 198088,
+      "onnx_file": "task097.onnx",
+      "onnx_size_bytes": 2514,
+      "last_updated": "2026-05-30T08:05:55.029443+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "098": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task098.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:55.029632+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "099": {
+      "cost": 24550,
+      "params": 4910,
+      "memory_bytes": 19640,
+      "onnx_file": "task099.onnx",
+      "onnx_size_bytes": 19867,
+      "last_updated": "2026-05-30T08:05:55.029844+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "100": {
+      "cost": 7411,
+      "params": 43,
+      "memory_bytes": 7368,
+      "onnx_file": "task100.onnx",
+      "onnx_size_bytes": 4976,
+      "last_updated": "2026-05-30T08:05:55.030531+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "101": {
+      "cost": 2450384,
+      "params": 4664,
+      "memory_bytes": 2445720,
+      "onnx_file": "task101.onnx",
+      "onnx_size_bytes": 39323,
+      "last_updated": "2026-05-30T08:05:55.033849+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "102": {
+      "cost": 92127,
+      "params": 339,
+      "memory_bytes": 91788,
+      "onnx_file": "task102.onnx",
+      "onnx_size_bytes": 22189,
+      "last_updated": "2026-05-30T08:05:55.036227+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "103": {
+      "cost": 505,
+      "params": 57,
+      "memory_bytes": 448,
+      "onnx_file": "task103.onnx",
+      "onnx_size_bytes": 1691,
+      "last_updated": "2026-05-30T08:05:55.036634+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "104": {
+      "cost": 10662,
+      "params": 1070,
+      "memory_bytes": 9592,
+      "onnx_file": "task104.onnx",
+      "onnx_size_bytes": 6372,
+      "last_updated": "2026-05-30T08:05:55.037213+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "105": {
+      "cost": 80484,
+      "params": 7268,
+      "memory_bytes": 73216,
+      "onnx_file": "task105.onnx",
+      "onnx_size_bytes": 35313,
+      "last_updated": "2026-05-30T08:05:55.038201+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "106": {
+      "cost": 3017,
+      "params": 125,
+      "memory_bytes": 2892,
+      "onnx_file": "task106.onnx",
+      "onnx_size_bytes": 2959,
+      "last_updated": "2026-05-30T08:05:55.038690+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "107": {
+      "cost": 181685,
+      "params": 13681,
+      "memory_bytes": 168004,
+      "onnx_file": "task107.onnx",
+      "onnx_size_bytes": 31211,
+      "last_updated": "2026-05-30T08:05:55.039812+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "108": {
+      "cost": 9000,
+      "params": 1800,
+      "memory_bytes": 7200,
+      "onnx_file": "task108.onnx",
+      "onnx_size_bytes": 7476,
+      "last_updated": "2026-05-30T08:05:55.040014+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "109": {
+      "cost": 235335,
+      "params": 983,
+      "memory_bytes": 234352,
+      "onnx_file": "task109.onnx",
+      "onnx_size_bytes": 5513,
+      "last_updated": "2026-05-30T08:05:55.040831+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "110": {
+      "cost": 397145,
+      "params": 1185,
+      "memory_bytes": 395960,
+      "onnx_file": "task110.onnx",
+      "onnx_size_bytes": 21516,
+      "last_updated": "2026-05-30T08:05:55.043488+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "111": {
+      "cost": 4612,
+      "params": 28,
+      "memory_bytes": 4584,
+      "onnx_file": "task111.onnx",
+      "onnx_size_bytes": 1479,
+      "last_updated": "2026-05-30T08:05:55.043865+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "112": {
+      "cost": 118618,
+      "params": 106,
+      "memory_bytes": 118512,
+      "onnx_file": "task112.onnx",
+      "onnx_size_bytes": 4009,
+      "last_updated": "2026-05-30T08:05:55.044726+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "113": {
+      "cost": 150,
+      "params": 30,
+      "memory_bytes": 120,
+      "onnx_file": "task113.onnx",
+      "onnx_size_bytes": 205,
+      "last_updated": "2026-05-30T08:05:55.044880+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "114": {
+      "cost": 2947,
+      "params": 163,
+      "memory_bytes": 2784,
+      "onnx_file": "task114.onnx",
+      "onnx_size_bytes": 4739,
+      "last_updated": "2026-05-30T08:05:55.045591+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "115": {
+      "cost": 5448,
+      "params": 80,
+      "memory_bytes": 5368,
+      "onnx_file": "task115.onnx",
+      "onnx_size_bytes": 5089,
+      "last_updated": "2026-05-30T08:05:55.046421+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "116": {
+      "cost": 150,
+      "params": 30,
+      "memory_bytes": 120,
+      "onnx_file": "task116.onnx",
+      "onnx_size_bytes": 205,
+      "last_updated": "2026-05-30T08:05:55.046595+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "117": {
+      "cost": 38304,
+      "params": 628,
+      "memory_bytes": 37676,
+      "onnx_file": "task117.onnx",
+      "onnx_size_bytes": 8282,
+      "last_updated": "2026-05-30T08:05:55.048096+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "118": {
+      "cost": 3376451,
+      "params": 1887,
+      "memory_bytes": 3374564,
+      "onnx_file": "task118.onnx",
+      "onnx_size_bytes": 160418,
+      "last_updated": "2026-05-30T08:05:55.063101+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "119": {
+      "cost": 119576,
+      "params": 1912,
+      "memory_bytes": 117664,
+      "onnx_file": "task119.onnx",
+      "onnx_size_bytes": 25937,
+      "last_updated": "2026-05-30T08:05:55.065620+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "120": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task120.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:55.065827+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "121": {
+      "cost": 6674,
+      "params": 46,
+      "memory_bytes": 6628,
+      "onnx_file": "task121.onnx",
+      "onnx_size_bytes": 3361,
+      "last_updated": "2026-05-30T08:05:55.066464+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "122": {
+      "cost": 12550,
+      "params": 2510,
+      "memory_bytes": 10040,
+      "onnx_file": "task122.onnx",
+      "onnx_size_bytes": 10264,
+      "last_updated": "2026-05-30T08:05:55.066646+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "123": {
+      "cost": 8113,
+      "params": 949,
+      "memory_bytes": 7164,
+      "onnx_file": "task123.onnx",
+      "onnx_size_bytes": 9019,
+      "last_updated": "2026-05-30T08:05:55.067115+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "124": {
+      "cost": 18017,
+      "params": 353,
+      "memory_bytes": 17664,
+      "onnx_file": "task124.onnx",
+      "onnx_size_bytes": 4359,
+      "last_updated": "2026-05-30T08:05:55.068394+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "125": {
+      "cost": 31955,
+      "params": 247,
+      "memory_bytes": 31708,
+      "onnx_file": "task125.onnx",
+      "onnx_size_bytes": 3054,
+      "last_updated": "2026-05-30T08:05:55.069047+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "126": {
+      "cost": 192123,
+      "params": 47,
+      "memory_bytes": 192076,
+      "onnx_file": "task126.onnx",
+      "onnx_size_bytes": 2785,
+      "last_updated": "2026-05-30T08:05:55.069702+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "127": {
+      "cost": 4500,
+      "params": 900,
+      "memory_bytes": 3600,
+      "onnx_file": "task127.onnx",
+      "onnx_size_bytes": 3800,
+      "last_updated": "2026-05-30T08:05:55.069864+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "128": {
+      "cost": 201310,
+      "params": 102,
+      "memory_bytes": 201208,
+      "onnx_file": "task128.onnx",
+      "onnx_size_bytes": 3385,
+      "last_updated": "2026-05-30T08:05:55.070503+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "129": {
+      "cost": 994,
+      "params": 30,
+      "memory_bytes": 964,
+      "onnx_file": "task129.onnx",
+      "onnx_size_bytes": 1218,
+      "last_updated": "2026-05-30T08:05:55.070840+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "130": {
+      "cost": 16380,
+      "params": 108,
+      "memory_bytes": 16272,
+      "onnx_file": "task130.onnx",
+      "onnx_size_bytes": 1315,
+      "last_updated": "2026-05-30T08:05:55.071249+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "131": {
+      "cost": 67095,
+      "params": 951,
+      "memory_bytes": 66144,
+      "onnx_file": "task131.onnx",
+      "onnx_size_bytes": 12052,
+      "last_updated": "2026-05-30T08:05:55.073471+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "132": {
+      "cost": 41936,
+      "params": 64,
+      "memory_bytes": 41872,
+      "onnx_file": "task132.onnx",
+      "onnx_size_bytes": 3784,
+      "last_updated": "2026-05-30T08:05:55.074344+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "133": {
+      "cost": 10416746,
+      "params": 228894,
+      "memory_bytes": 10187852,
+      "onnx_file": "task133.onnx",
+      "onnx_size_bytes": 783456,
+      "last_updated": "2026-05-30T08:05:55.082171+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "134": {
+      "cost": 16968,
+      "params": 80,
+      "memory_bytes": 16888,
+      "onnx_file": "task134.onnx",
+      "onnx_size_bytes": 7242,
+      "last_updated": "2026-05-30T08:05:55.083468+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "135": {
+      "cost": 440,
+      "params": 16,
+      "memory_bytes": 424,
+      "onnx_file": "task135.onnx",
+      "onnx_size_bytes": 312,
+      "last_updated": "2026-05-30T08:05:55.083766+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "136": {
+      "cost": 21365,
+      "params": 433,
+      "memory_bytes": 20932,
+      "onnx_file": "task136.onnx",
+      "onnx_size_bytes": 5002,
+      "last_updated": "2026-05-30T08:05:55.084552+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "137": {
+      "cost": 142298,
+      "params": 966,
+      "memory_bytes": 141332,
+      "onnx_file": "task137.onnx",
+      "onnx_size_bytes": 3886,
+      "last_updated": "2026-05-30T08:05:55.085281+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "138": {
+      "cost": 413987,
+      "params": 135,
+      "memory_bytes": 413852,
+      "onnx_file": "task138.onnx",
+      "onnx_size_bytes": 11582,
+      "last_updated": "2026-05-30T08:05:55.087331+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "139": {
+      "cost": 13722,
+      "params": 174,
+      "memory_bytes": 13548,
+      "onnx_file": "task139.onnx",
+      "onnx_size_bytes": 3887,
+      "last_updated": "2026-05-30T08:05:55.088139+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "140": {
+      "cost": 440,
+      "params": 16,
+      "memory_bytes": 424,
+      "onnx_file": "task140.onnx",
+      "onnx_size_bytes": 312,
+      "last_updated": "2026-05-30T08:05:55.088366+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "141": {
+      "cost": 34617,
+      "params": 69,
+      "memory_bytes": 34548,
+      "onnx_file": "task141.onnx",
+      "onnx_size_bytes": 2367,
+      "last_updated": "2026-05-30T08:05:55.088885+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "142": {
+      "cost": 9000,
+      "params": 1800,
+      "memory_bytes": 7200,
+      "onnx_file": "task142.onnx",
+      "onnx_size_bytes": 7476,
+      "last_updated": "2026-05-30T08:05:55.089076+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "143": {
+      "cost": 25925,
+      "params": 57,
+      "memory_bytes": 25868,
+      "onnx_file": "task143.onnx",
+      "onnx_size_bytes": 2712,
+      "last_updated": "2026-05-30T08:05:55.089639+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "144": {
+      "cost": 1466,
+      "params": 50,
+      "memory_bytes": 1416,
+      "onnx_file": "task144.onnx",
+      "onnx_size_bytes": 1661,
+      "last_updated": "2026-05-30T08:05:55.090034+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "145": {
+      "cost": 147713,
+      "params": 933,
+      "memory_bytes": 146780,
+      "onnx_file": "task145.onnx",
+      "onnx_size_bytes": 31456,
+      "last_updated": "2026-05-30T08:05:55.094148+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "146": {
+      "cost": 4186,
+      "params": 26,
+      "memory_bytes": 4160,
+      "onnx_file": "task146.onnx",
+      "onnx_size_bytes": 1953,
+      "last_updated": "2026-05-30T08:05:55.094781+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "147": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task147.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:55.094987+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "148": {
+      "cost": 40293,
+      "params": 353,
+      "memory_bytes": 39940,
+      "onnx_file": "task148.onnx",
+      "onnx_size_bytes": 10593,
+      "last_updated": "2026-05-30T08:05:55.096663+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "149": {
+      "cost": 5396,
+      "params": 44,
+      "memory_bytes": 5352,
+      "onnx_file": "task149.onnx",
+      "onnx_size_bytes": 1424,
+      "last_updated": "2026-05-30T08:05:55.097104+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "150": {
+      "cost": 4622,
+      "params": 34,
+      "memory_bytes": 4588,
+      "onnx_file": "task150.onnx",
+      "onnx_size_bytes": 1342,
+      "last_updated": "2026-05-30T08:05:55.097451+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "151": {
+      "cost": 28649,
+      "params": 85,
+      "memory_bytes": 28564,
+      "onnx_file": "task151.onnx",
+      "onnx_size_bytes": 2374,
+      "last_updated": "2026-05-30T08:05:55.098006+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "152": {
+      "cost": 9000,
+      "params": 1800,
+      "memory_bytes": 7200,
+      "onnx_file": "task152.onnx",
+      "onnx_size_bytes": 7476,
+      "last_updated": "2026-05-30T08:05:55.098171+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "153": {
+      "cost": 1485059,
+      "params": 5347,
+      "memory_bytes": 1479712,
+      "onnx_file": "task153.onnx",
+      "onnx_size_bytes": 862373,
+      "last_updated": "2026-05-30T08:05:55.282445+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "154": {
+      "cost": 76382,
+      "params": 966,
+      "memory_bytes": 75416,
+      "onnx_file": "task154.onnx",
+      "onnx_size_bytes": 7672,
+      "last_updated": "2026-05-30T08:05:55.283461+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "155": {
+      "cost": 4627,
+      "params": 35,
+      "memory_bytes": 4592,
+      "onnx_file": "task155.onnx",
+      "onnx_size_bytes": 1369,
+      "last_updated": "2026-05-30T08:05:55.283846+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "156": {
+      "cost": 123135,
+      "params": 967,
+      "memory_bytes": 122168,
+      "onnx_file": "task156.onnx",
+      "onnx_size_bytes": 7878,
+      "last_updated": "2026-05-30T08:05:55.285768+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "157": {
+      "cost": 8553865,
+      "params": 202281,
+      "memory_bytes": 8351584,
+      "onnx_file": "task157.onnx",
+      "onnx_size_bytes": 857933,
+      "last_updated": "2026-05-30T08:05:55.294898+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "158": {
+      "cost": 6950825,
+      "params": 765,
+      "memory_bytes": 6950060,
+      "onnx_file": "task158.onnx",
+      "onnx_size_bytes": 95359,
+      "last_updated": "2026-05-30T08:05:55.305543+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "159": {
+      "cost": 234609,
+      "params": 4105,
+      "memory_bytes": 230504,
+      "onnx_file": "task159.onnx",
+      "onnx_size_bytes": 12986,
+      "last_updated": "2026-05-30T08:05:55.306653+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "160": {
+      "cost": 15275,
+      "params": 95,
+      "memory_bytes": 15180,
+      "onnx_file": "task160.onnx",
+      "onnx_size_bytes": 2382,
+      "last_updated": "2026-05-30T08:05:55.307244+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "161": {
+      "cost": 373097,
+      "params": 81,
+      "memory_bytes": 373016,
+      "onnx_file": "task161.onnx",
+      "onnx_size_bytes": 6030,
+      "last_updated": "2026-05-30T08:05:55.308220+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "162": {
+      "cost": 130311,
+      "params": 43,
+      "memory_bytes": 130268,
+      "onnx_file": "task162.onnx",
+      "onnx_size_bytes": 2290,
+      "last_updated": "2026-05-30T08:05:55.308742+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "163": {
+      "cost": 43311,
+      "params": 1655,
+      "memory_bytes": 41656,
+      "onnx_file": "task163.onnx",
+      "onnx_size_bytes": 13897,
+      "last_updated": "2026-05-30T08:05:55.309871+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "164": {
+      "cost": 150,
+      "params": 30,
+      "memory_bytes": 120,
+      "onnx_file": "task164.onnx",
+      "onnx_size_bytes": 205,
+      "last_updated": "2026-05-30T08:05:55.310078+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "165": {
+      "cost": 163130,
+      "params": 994,
+      "memory_bytes": 162136,
+      "onnx_file": "task165.onnx",
+      "onnx_size_bytes": 4932,
+      "last_updated": "2026-05-30T08:05:55.310700+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "166": {
+      "cost": 34009,
+      "params": 37,
+      "memory_bytes": 33972,
+      "onnx_file": "task166.onnx",
+      "onnx_size_bytes": 1650,
+      "last_updated": "2026-05-30T08:05:55.311115+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "167": {
+      "cost": 1982,
+      "params": 294,
+      "memory_bytes": 1688,
+      "onnx_file": "task167.onnx",
+      "onnx_size_bytes": 2397,
+      "last_updated": "2026-05-30T08:05:55.311446+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "168": {
+      "cost": 37861,
+      "params": 285,
+      "memory_bytes": 37576,
+      "onnx_file": "task168.onnx",
+      "onnx_size_bytes": 7319,
+      "last_updated": "2026-05-30T08:05:55.312337+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "169": {
+      "cost": 73775,
+      "params": 727,
+      "memory_bytes": 73048,
+      "onnx_file": "task169.onnx",
+      "onnx_size_bytes": 23838,
+      "last_updated": "2026-05-30T08:05:55.315265+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "170": {
+      "cost": 102767,
+      "params": 3815,
+      "memory_bytes": 98952,
+      "onnx_file": "task170.onnx",
+      "onnx_size_bytes": 64869,
+      "last_updated": "2026-05-30T08:05:55.323513+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "171": {
+      "cost": 4550,
+      "params": 910,
+      "memory_bytes": 3640,
+      "onnx_file": "task171.onnx",
+      "onnx_size_bytes": 3864,
+      "last_updated": "2026-05-30T08:05:55.323721+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "172": {
+      "cost": 150,
+      "params": 30,
+      "memory_bytes": 120,
+      "onnx_file": "task172.onnx",
+      "onnx_size_bytes": 205,
+      "last_updated": "2026-05-30T08:05:55.323876+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "173": {
+      "cost": 608684,
+      "params": 216,
+      "memory_bytes": 608468,
+      "onnx_file": "task173.onnx",
+      "onnx_size_bytes": 10130,
+      "last_updated": "2026-05-30T08:05:55.325186+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "174": {
+      "cost": 55546,
+      "params": 74,
+      "memory_bytes": 55472,
+      "onnx_file": "task174.onnx",
+      "onnx_size_bytes": 61861,
+      "last_updated": "2026-05-30T08:05:55.334617+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "175": {
+      "cost": 107899,
+      "params": 2751,
+      "memory_bytes": 105148,
+      "onnx_file": "task175.onnx",
+      "onnx_size_bytes": 12434,
+      "last_updated": "2026-05-30T08:05:55.335250+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "176": {
+      "cost": 10200,
+      "params": 120,
+      "memory_bytes": 10080,
+      "onnx_file": "task176.onnx",
+      "onnx_size_bytes": 1442,
+      "last_updated": "2026-05-30T08:05:55.335576+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "177": {
+      "cost": 218725,
+      "params": 105,
+      "memory_bytes": 218620,
+      "onnx_file": "task177.onnx",
+      "onnx_size_bytes": 4202,
+      "last_updated": "2026-05-30T08:05:55.336299+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "178": {
+      "cost": 43125,
+      "params": 569,
+      "memory_bytes": 42556,
+      "onnx_file": "task178.onnx",
+      "onnx_size_bytes": 11323,
+      "last_updated": "2026-05-30T08:05:55.338191+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "179": {
+      "cost": 0,
+      "params": 0,
+      "memory_bytes": 0,
+      "onnx_file": "task179.onnx",
+      "onnx_size_bytes": 149,
+      "last_updated": "2026-05-30T08:05:55.338331+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "180": {
+      "cost": 12546,
+      "params": 922,
+      "memory_bytes": 11624,
+      "onnx_file": "task180.onnx",
+      "onnx_size_bytes": 4436,
+      "last_updated": "2026-05-30T08:05:55.338621+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "181": {
+      "cost": 40,
+      "params": 8,
+      "memory_bytes": 32,
+      "onnx_file": "task181.onnx",
+      "onnx_size_bytes": 183,
+      "last_updated": "2026-05-30T08:05:55.338812+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "182": {
+      "cost": 1736490,
+      "params": 946,
+      "memory_bytes": 1735544,
+      "onnx_file": "task182.onnx",
+      "onnx_size_bytes": 70487,
+      "last_updated": "2026-05-30T08:05:55.345618+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "183": {
+      "cost": 66310,
+      "params": 38,
+      "memory_bytes": 66272,
+      "onnx_file": "task183.onnx",
+      "onnx_size_bytes": 4665,
+      "last_updated": "2026-05-30T08:05:55.346597+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "184": {
+      "cost": 54203,
+      "params": 43,
+      "memory_bytes": 54160,
+      "onnx_file": "task184.onnx",
+      "onnx_size_bytes": 6956,
+      "last_updated": "2026-05-30T08:05:55.347559+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "185": {
+      "cost": 101531,
+      "params": 67,
+      "memory_bytes": 101464,
+      "onnx_file": "task185.onnx",
+      "onnx_size_bytes": 18903,
+      "last_updated": "2026-05-30T08:05:55.350179+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "186": {
+      "cost": 2318,
+      "params": 382,
+      "memory_bytes": 1936,
+      "onnx_file": "task186.onnx",
+      "onnx_size_bytes": 2440,
+      "last_updated": "2026-05-30T08:05:55.350493+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "187": {
+      "cost": 314165,
+      "params": 913,
+      "memory_bytes": 313252,
+      "onnx_file": "task187.onnx",
+      "onnx_size_bytes": 8874,
+      "last_updated": "2026-05-30T08:05:55.351877+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "188": {
+      "cost": 11272,
+      "params": 48,
+      "memory_bytes": 11224,
+      "onnx_file": "task188.onnx",
+      "onnx_size_bytes": 4378,
+      "last_updated": "2026-05-30T08:05:55.352675+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "189": {
+      "cost": 47568,
+      "params": 304,
+      "memory_bytes": 47264,
+      "onnx_file": "task189.onnx",
+      "onnx_size_bytes": 8582,
+      "last_updated": "2026-05-30T08:05:55.354340+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "190": {
+      "cost": 29598,
+      "params": 178,
+      "memory_bytes": 29420,
+      "onnx_file": "task190.onnx",
+      "onnx_size_bytes": 8803,
+      "last_updated": "2026-05-30T08:05:55.355647+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "191": {
+      "cost": 1370277,
+      "params": 165,
+      "memory_bytes": 1370112,
+      "onnx_file": "task191.onnx",
+      "onnx_size_bytes": 132255,
+      "last_updated": "2026-05-30T08:05:55.367098+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "192": {
+      "cost": 94873,
+      "params": 61,
+      "memory_bytes": 94812,
+      "onnx_file": "task192.onnx",
+      "onnx_size_bytes": 2533,
+      "last_updated": "2026-05-30T08:05:55.367704+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "193": {
+      "cost": 93105,
+      "params": 61,
+      "memory_bytes": 93044,
+      "onnx_file": "task193.onnx",
+      "onnx_size_bytes": 1947,
+      "last_updated": "2026-05-30T08:05:55.368185+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "194": {
+      "cost": 9000,
+      "params": 1800,
+      "memory_bytes": 7200,
+      "onnx_file": "task194.onnx",
+      "onnx_size_bytes": 7476,
+      "last_updated": "2026-05-30T08:05:55.368364+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "195": {
+      "cost": 36555,
+      "params": 1919,
+      "memory_bytes": 34636,
+      "onnx_file": "task195.onnx",
+      "onnx_size_bytes": 5403,
+      "last_updated": "2026-05-30T08:05:55.369204+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "196": {
+      "cost": 50735,
+      "params": 67,
+      "memory_bytes": 50668,
+      "onnx_file": "task196.onnx",
+      "onnx_size_bytes": 3479,
+      "last_updated": "2026-05-30T08:05:55.369931+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "197": {
+      "cost": 65484,
+      "params": 16,
+      "memory_bytes": 65468,
+      "onnx_file": "task197.onnx",
+      "onnx_size_bytes": 1780,
+      "last_updated": "2026-05-30T08:05:55.370417+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "198": {
+      "cost": 210501,
+      "params": 913,
+      "memory_bytes": 209588,
+      "onnx_file": "task198.onnx",
+      "onnx_size_bytes": 7001,
+      "last_updated": "2026-05-30T08:05:55.371373+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "199": {
+      "cost": 25958,
+      "params": 54,
+      "memory_bytes": 25904,
+      "onnx_file": "task199.onnx",
+      "onnx_size_bytes": 2970,
+      "last_updated": "2026-05-30T08:05:55.371965+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
+      "author": "gitzhubj"
+    },
+    "200": {
+      "cost": 3150890,
+      "params": 198010,
+      "memory_bytes": 2952880,
+      "onnx_file": "task200.onnx",
+      "onnx_size_bytes": 797927,
+      "last_updated": "2026-05-30T08:05:55.374044+00:00",
+      "commit": "3d443c85220be515bf90d60003311bb23bf5fee9",
       "author": "gitzhubj"
     }
   }
