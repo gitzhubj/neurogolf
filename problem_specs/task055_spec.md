@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv（固定颜色查找表，按区块位置分配）
-- locality: 0
-- single_linear_conv_possible: probably（若颜色分配仅依赖行列索引，1x1 Conv 可行）
-- recommended_kernel: 1x1
-- nonlinearity_needed: no
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 164 nodes: Cast+Concat+Conv+Equal+Gather+Mul+Sub+Sum+Where. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Equal+Gather+Mul+Sub+Sum+Where (164 nodes, 37 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 055
-primitive_types: [grid_fill, region_coloring, fixed_palette]
-input_shape_rule: same as output
-output_shape_rule: same as input
-formal_rule_short: fill each rectangle region bounded by color-8 gridlines with a predefined color based on region position
-locality: 0
-single_linear_conv_possible: probably
-recommended_architecture: single_1x1_conv
-main_risk: color assignment rule not fully determined
-confidence: medium
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 164 nodes: Cast+Concat+Conv+Equal+Gather+Mul+Sub+Sum+Where. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Concat+Conv+Equal+Gather+Mul+Sub+Sum+Where
+actual_nodes: 164
 ```

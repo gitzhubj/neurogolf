@@ -37,24 +37,33 @@ for each row r:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: global（需要知道每行每种颜色的全局最左最右位置）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：每行需要全局 argmin/argmax 定位每种颜色的左右边界，单层 Conv 无法直接用线性权重实现"填充区间"操作。需要逻辑判断或至少多层 ReLU Conv 来近似。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (18 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: And+Cast+Concat+CumSum+Not+Or+Pad+Slice+Split...
+
+Baseline 实际架构: And+Cast+Concat+CumSum+Not+Or+Pad+Slice+Split (18 nodes, 6 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "041"
-primitive_types: ["fill_between_per_row_per_color"]
-input_shape_rule: "same as output, typically 10x10"
-output_shape_rule: "same as input"
-formal_rule_short: "per row, per color: fill between leftmost and rightmost occurrence"
-locality: "global (per row)"
-single_linear_conv_possible: "no"
-recommended_architecture: "multi_layer_conv_relu"
-main_risk: "单像素颜色是否填充已明确"
-confidence: "high"
+task_id: 041
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
+single_linear_conv_possible: no
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (18 nodes). Study baseline directly.
+fusion_hint: Ops used: And+Cast+Concat+CumSum+Not+Or+Pad+Slice+Split...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: And+Cast+Concat+CumSum+Not+Or+Pad+Slice+Split
+actual_nodes: 18
 ```

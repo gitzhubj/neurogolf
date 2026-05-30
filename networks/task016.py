@@ -1,25 +1,34 @@
-"""Task 016 — 逐像素颜色交换 (4-pair swap) via 1×1 Conv"""
-import sys
+"""Task 016 — 核心变换：逐像素颜色映射（同尺寸，4对颜色互换）。
+
+架构: gather_lookup (unknown)
+Baseline 参数: 10, 节点: 1
+"""
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
-MAPPING = {1: 5, 5: 1, 2: 6, 6: 2, 3: 4, 4: 3, 8: 9, 9: 8}
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
 
-
-def weight_fn(ch_out, ch_in, kernel_coord):
-    if kernel_coord == (0, 0):
-        if ch_in in MAPPING and ch_out == MAPPING[ch_in]:
-            return 1.0
-        if ch_in not in MAPPING and ch_in == ch_out:
-            return 1.0
-    return 0.0
+color_idx_data = np.array([0, 5, 6, 4, 3, 1, 2, 7, 9, 8], dtype=np.int64)
+color_idx = helper.make_tensor(
+    name="color_idx", data_type=onnx.TensorProto.INT64, dims=[10],
+    vals=color_idx_data.flatten().tolist())
 
 
 def build():
-    return nu.single_layer_conv2d_network(weight_fn, kernel_size=1)
-
+    nodes, inits = [], []
+    inits.append(color_idx)
+    nodes.append(helper.make_node("Gather", ["input", "color_idx"], ["output"], axis=1))
+    x = helper.make_tensor_value_info("input", _DT, _GS)
+    y = helper.make_tensor_value_info("output", _DT, _GS)
+    g = helper.make_graph(nodes, "g", [x], [y], inits)
+    return helper.make_model(g, ir_version=8,
+                             opset_imports=[helper.make_opsetid("", 13)])
 
 if __name__ == '__main__':
     task_num = 16

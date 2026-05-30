@@ -32,23 +32,33 @@ for r in 0..2, c in 0..3:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: constant_or_lookup_like_network（固定坐标映射 + 权重查表）
-- locality: global（2× 上采样 + 镜像需要坐标变换）
-- single_linear_conv_possible: no（2× 上采样不是单层 Conv 可表达的）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: no
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (1 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: GridSample...
+
+Baseline 实际架构: GridSample (1 nodes, 1 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 083
-primitive_types: [2x_upscale, fourfold_symmetry, mirror_tiling]
-input_shape_rule: fixed 3x4
-output_shape_rule: fixed 6x8
-formal_rule_short: double input size by 4-fold Klein symmetry (original + H-mirror + V-mirror + 180-rotate)
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
 single_linear_conv_possible: no
-recommended_architecture: constant_or_lookup_like_network
-main_risk: none
-confidence: high
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (1 nodes). Study baseline directly.
+fusion_hint: Ops used: GridSample...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: GridSample
+actual_nodes: 1
 ```

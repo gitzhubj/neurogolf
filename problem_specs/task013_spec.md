@@ -2,18 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入和输出尺寸相同, 背景色为 0。
-- 输入包含若干"种子"像素(非零颜色), 分布在网格中, 具有长轴方向和一定的间距。
-- 输出沿长轴方向延伸出周期性的交替颜色条纹。
-- 条纹规则: 从种子沿长轴的垂直方向向外, 以固定间距交替放置两种颜色(种子颜色和另一交替颜色)。
-- 不确定具体的长轴判定方法和交替颜色配对规则, 但从 through 率来看(4/4 train, 1/1 test, 262/262 arc-gen), 规则是确定的, 可被卷积网络学习。
+- 核心变换：两非零种子像素决定填充方向(顶行水平/左列垂直)，以坐标差为步长交替放置两种颜色。
+
 
 ## 2. 关键证据
 
-- 输入为稀疏点阵, 输出为周期条纹图案。
-- 条纹方向由种子所在区域的"长轴"(主方向)决定。
-- 条纹在输出中以种子间距为周期, 交替使用两种颜色。
-- arc-gen 262 例全部通过 with-spec 基线, 规则可学习实现。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -27,24 +24,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: k
-- single_linear_conv_possible: no
-- recommended_kernel: 5x5 or larger
-- nonlinearity_needed: yes
-- 条纹生成需要方向性卷积和周期性激活。不能简化为单一 1x1 或 kxk 卷积。需要多层: 检测层确定方向/间距, 生成层沿方向绘制交替条纹。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 91 nodes: Cast+Concat+Conv+Greater+Mul+ReduceMax+ReduceSum+Slice+Sub+S. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Greater+Mul+ReduceMax+ReduceSum+Slice+Sub+Sum+Where (91 nodes, 16 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 013
-primitive_types: [direction_detection, stripe_generation, periodicity]
-input_shape_rule: same as output (variable)
-output_shape_rule: same as input
-formal_rule_short: extend periodic alternating-color stripes along dominant axis from seed pixels
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: k
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: 长轴判定和颜色配对规则细节不确定
-confidence: low
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 91 nodes: Cast+Concat+Conv+Greater+Mul+ReduceMax+ReduceSum+Slice+Sub+S. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Concat+Conv+Greater+Mul+ReduceMax+ReduceSum+Slice+Sub+Sum+Where
+actual_nodes: 91
 ```

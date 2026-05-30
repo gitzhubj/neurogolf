@@ -21,23 +21,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_3x3_conv
-- locality: 1
-- single_linear_conv_possible: probably
-- recommended_kernel: 3x3
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (35 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: And+Concat+Greater+Not+Or+Pad+Slice...
+
+Baseline 实际架构: And+Concat+Greater+Not+Or+Pad+Slice (35 nodes, 17 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 081
-primitive_types: [corner_detection, local_pattern_fill]
-input_shape_rule: fixed 7x7
-output_shape_rule: fixed 7x7
-formal_rule_short: for each 8-L shape, fill diagonally adjacent empty cell with 1
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_3x3_conv
-main_risk: none
-confidence: high
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
+single_linear_conv_possible: no
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (35 nodes). Study baseline directly.
+fusion_hint: Ops used: And+Concat+Greater+Not+Or+Pad+Slice...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: And+Concat+Greater+Not+Or+Pad+Slice
+actual_nodes: 35
 ```

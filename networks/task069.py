@@ -1,19 +1,27 @@
-"""Task 069 — Replace color-8 connected components with the pattern of
-the non-8 source component, preserving shape.
+"""Task 069 — 核心变换：彩色模板图案替换全图中所有同形状的天蓝(8)区域。
 
-Stub: Infeasible with simple Conv. Requires: (1) connected component
-analysis to identify source (non-8) and targets (all-8), (2) shape
-matching, (3) pattern transfer. Connected component labeling needs
-iterative propagation or flood-fill, which exceeds Conv capabilities.
-Pattern transfer requires copying source pixel values to each target's
-spatial positions based on shape-matched offsets.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task069.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 69

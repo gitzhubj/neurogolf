@@ -1,21 +1,27 @@
-"""Task 011 - 11x11->11x11 3x3 block dominant color fill (STUB: identity only)"""
-import sys
+"""Task 011 — ?
+
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
+"""
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
 
-def weight_fn(ch_out, ch_in, kernel_coord):
-    """Stub: single 1x1 Conv identity. Replace with actual implementation."""
-    if kernel_coord == (0, 0) and ch_out == ch_in:
-        return 1.0
-    return 0.0
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
 
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(weight_fn, kernel_size=1)
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task011.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 11

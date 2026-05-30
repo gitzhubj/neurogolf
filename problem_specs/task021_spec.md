@@ -31,23 +31,33 @@ output[r_out, c_out] = region_color(region between rows_sep[r_out]..rows_sep[r_o
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需要检测完整行/列分隔线、区域划分和颜色聚合）
-- locality: global（分隔线检测和区域映射依赖全局坐标）
-- single_linear_conv_possible: no（区域分割和颜色聚合超出单层 Conv 能力）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（需要行/列全等判断和区域索引逻辑）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 214 nodes: Add+And+Cast+Concat+Conv+Equal+Greater+Less+Mul+Not+OneHot+R. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Add+And+Cast+Concat+Conv+Equal+Greater+Less+Mul+Not+OneHot+ReduceMax+ReduceMin+ReduceSum+Reshape+Squeeze+Sub+Sum+Where (214 nodes, 20 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 021
-primitive_types: [grid_partition, region_color_extraction, separator_line_detection]
-input_shape_rule: variable, determined by separator rows/cols
-output_shape_rule: (n_sep_rows - 1) × (n_sep_cols - 1)
-formal_rule_short: partition grid by full-row/full-col separator lines; each region's uniform color maps to one output cell
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: separator color may vary (7 in train, 5 in test)
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 214 nodes: Add+And+Cast+Concat+Conv+Equal+Greater+Less+Mul+Not+OneHot+R. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Add+And+Cast+Concat+Conv+Equal+Greater+Less+Mul+Not+OneHot+ReduceMax+ReduceMin+ReduceSum+Reshape+Squeeze+Sub+Sum+Where
+actual_nodes: 214
 ```

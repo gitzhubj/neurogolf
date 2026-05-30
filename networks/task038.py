@@ -1,37 +1,30 @@
-"""Task 038 — ANALYSIS STUB.
+"""Task 038 — 核心变换：统计蓝色(1)的2x2方块个数N，输出1行5列，前N格为1其余为0。
 
-From spec: Superpixel adjacency counting. 9x9 grid divided into 3x3
-superpixels. Each superpixel may contain a 2x2 block of color 1 or 2.
-Output is 1x5 binary vector indicating which adjacency patterns exist
-between superpixels.
-
-NOT CONV-AMENABLE AND DIFFERENT SHAPE: Input 9x9 → Output 1x5.
-Requires superpixel partitioning, color detection in each block,
-and adjacency relationship counting.
-
-EVEN WITH NETWORK: Output 1x5 must be placed at top-left of 30x30 canvas
-in (1,10,30,30) format with channel encoding. Complex structure.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 038: superpixel adjacency counting requires partition "
-        "analysis and relation counting — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task038.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 38
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

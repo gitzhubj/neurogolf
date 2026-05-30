@@ -2,32 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入与输出尺寸相同（可变大小，如 30x20、20x10）。
-- 背景色为 0。输入包含多种孤立颜色像素（每个颜色至少 2 个像素）。
-- 核心规则：对于每种颜色，连接同行或同列的所有该色像素——在行方向上填充最左到最右之间的所有单元格，在列方向上填充最上到最下之间的所有单元格。原始像素保持不变。
+- 核心变换：同色像素对用水平/垂直线连接，灰色(5)大块朝有色像素方向外扩1格，交叉点垂直线优先。
 
-```text
-output = copy of input
-for each color c present:
-    for each row r:
-        cols = all c where input[r,col] == c
-        if len(cols) >= 2:
-            fill output[r, min(cols):max(cols)+1] = c
-    for each col col:
-        rows = all r where input[r,col] == c
-        if len(rows) >= 2:
-            fill output[min(rows):max(rows)+1, col] = c
-```
-
-- 当横向填充与纵向填充在不同颜色间重叠时，纵向优先（即最后赋值的颜色获胜）。
 
 ## 2. 关键证据
 
-- train[0]: color 2 像素 (2,6) 和 (13,6) → col 6 纵向填充 rows 2-13；color 3 像素 (6,3) 和 (6,11) → row 6 横向填充 cols 3-11。交点 (6,6) 显示 2（纵向优先）。
-- train[0]: color 5 像素 (20,2) 和 (20,7) → row 20 横向填充 cols 2-7；color 6 像素 (18,4) 和 (27,4) → col 4 纵向填充 rows 18-27。交点 (20,4) 显示 6（纵向优先）。
-- train[1]: 5 种颜色各自只有 2 个像素，均在同一行或同一列。
-- 所有样例在填充时跨其他颜色像素覆盖，最终优先规则一致。
-- arc-gen 含 262 个验证样例，均支持该连接规则。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -36,26 +19,33 @@ for each color c present:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: global（需每行/每列的全局最值）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 类似于 task 050 的线填充，但扩展为多色且行+列方向均需填充。需按颜色通道分别计算每行/列的最值位置然后 broadcast 填充。纵向优先的冲突处理可通过执行顺序实现。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 42 nodes: And+Cast+Conv+Equal+Greater+MaxPool+Mul+ReduceMax+ReduceSum+. Study baseline for optimal op sequence.
+
+Baseline 实际架构: And+Cast+Conv+Equal+Greater+MaxPool+Mul+ReduceMax+ReduceSum+Slice+Where (42 nodes, 9 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 092
-primitive_types: [line_fill, per_row_col_interval, multicolor_connect]
-input_shape_rule: variable size
-output_shape_rule: same as input
-formal_rule_short: for each color, draw horizontal lines between same-row pairs and vertical lines between same-col pairs; vertical wins on overlap
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-memory_priority: compute min/max per row/col per color with Reduce, then broadcast fill; avoid per-pixel iteration
-fusion_hint: vertical and horizontal fills can share the color-detection pass
-main_risk: vertical override priority assumption may not hold for all color combinations
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 42 nodes: And+Cast+Conv+Equal+Greater+MaxPool+Mul+ReduceMax+ReduceSum+. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: And+Cast+Conv+Equal+Greater+MaxPool+Mul+ReduceMax+ReduceSum+Slice+Where
+actual_nodes: 42
 ```

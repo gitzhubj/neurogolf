@@ -32,23 +32,33 @@ write shifted objects to output
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需连通组件分割、排序、水平平移）
-- locality: global（对象平移距离取决于前面所有对象的宽度累积）
-- single_linear_conv_possible: no（需对象级检测和可变平移）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 22 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: And+Cast+Concat+ConvTranspose+GatherND+Greater+MatMul+Neg+Or+ReduceMax+Reshape+Sum+Transpose (22 nodes, 6 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 009
-primitive_types: [object_movement, compaction, connected_component_reasoning]
-input_shape_rule: variable rectangular
-output_shape_rule: same as input
-formal_rule_short: horizontally compact objects by sliding them left to eliminate horizontal gaps; maintain shape and vertical position
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: exact gap/spacing between compacted objects needs verification; vertical-only assumption may be incomplete
-confidence: medium
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 22 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: And+Cast+Concat+ConvTranspose+GatherND+Greater+MatMul+Neg+Or+ReduceMax+Reshape+Sum+Transpose
+actual_nodes: 22
 ```

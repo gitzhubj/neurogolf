@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需检测 bounding box + 裁剪 + 拼接）
-- locality: global（bounding box 检测需全局扫描）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 18 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Add+ArgMax+Cast+Gather+Pad+ReduceMax+Slice+Transpose (18 nodes, 4 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 057
-primitive_types: [crop_to_content, horizontal_tiling, bounding_box]
-input_shape_rule: fixed 8x8
-output_shape_rule: fixed 3x6
-formal_rule_short: crop non-zero content to its bounding box, then duplicate horizontally to double width
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: multi-object handling undefined
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 18 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Add+ArgMax+Cast+Gather+Pad+ReduceMax+Slice+Transpose
+actual_nodes: 18
 ```

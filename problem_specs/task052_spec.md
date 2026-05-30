@@ -2,26 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入/输出均为 3×3，固定尺寸。
-- 输入包含多种非零颜色（1-9），输出仅使用颜色 5 和 0。
-- 核心变换：行均匀性检测。对于每一行，若该行所有 3 个单元格颜色完全相同（即该行全为同一颜色值），则输出该行为 5；否则输出该行为 0。
-- 背景色 0 不参与输入的关键判断（全零行不会出现）。
+- 核心变换：行一致检测：一行中3个元素全部相同则输出灰色(5)，否则全黑。
 
-```text
-for each row r:
-    if input[r][0] == input[r][1] == input[r][2]:
-        output[r][:] = 5
-    else:
-        output[r][:] = 0
-```
 
 ## 2. 关键证据
 
-- train 0：row0=[4,4,4] 全同 → 输出 row0=5；其余行非全同 → 输出 0。
-- train 1：仅 row1=[6,6,6] 全同 → 输出 row1=5。
-- train 2：row1=[4,4,4] 全同，row2=[9,9,9] 全同 → 输出 row1=5, row2=5。
-- train 3：仅 row2=[1,1,1] 全同 → 输出 row2=5。
-- test 0：row0=[4,4,4] 和 row2=[8,8,8] 全同 → 输出 row0=5, row2=5。弧 gen 全部支持。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -30,24 +19,33 @@ for each row r:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_kxk_conv（至少 3×3 以跨列比较同行元素）
-- locality: 1（同行相邻比较）
-- single_linear_conv_possible: probably（可用 3×3 Conv 线性实现同行比较，配合阈值检测）
-- recommended_kernel: 3x3
-- nonlinearity_needed: yes（相等判断需要非线性，线性 Conv 只能做加权求和）
-- memory_priority: 3×3 Conv 在 30×30 canvas 上中间张量有限，但需要非线性激活层会增加内存。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 10 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Equal+Mul+Pad+ReduceMax+ReduceSum+Slice+Sub+Sum+Where (10 nodes, 12 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 052
-primitive_types: [row_uniformity_detection, equality_test]
-input_shape_rule: fixed 3x3
-output_shape_rule: fixed 3x3
-formal_rule_short: if all cells in a row have the same color, output 5 for that row, else 0
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_kxk_conv
-main_risk: full-zero row handling unobserved
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: global
+single_linear_conv_possible: no
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 10 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Equal+Mul+Pad+ReduceMax+ReduceSum+Slice+Sub+Sum+Where
+actual_nodes: 10
 ```

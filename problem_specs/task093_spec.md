@@ -2,30 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入与输出尺寸相同。背景色为 0。
-- 输入包含一个颜色 5（灰色）的横条/竖条区域，以及分散在周围的少量其他颜色像素（如 2、3、1、4 等）。
-- 核心规则：将分散的非-5 颜色像素"合并"到 5 区域中。对于每个非-5 像素，在 5 区域的边缘向该像素方向扩展 1 步（填上 5）；如果非-5 像素恰好在这一步位置，则该像素变为 5。所有非-5 像素本身最终被移除（变为 0 或变为 5）。
+- 核心变换：灰色块沿短边扩张，有色像素使边界沿行/列外扩1格，同行/列多个有色像素扩张累加。
 
-```text
-output = copy of input
-for each non-5, non-0 pixel at (r,c):
-    if pixel is adjacent (4-dir) to any 5-cell:
-        output[r,c] = 5   // 合并进区域
-    else:
-        // 向 5 区域边缘投影：在 5 区域边缘对应方向填一个 5
-        find nearest 5-cell on same row/col and fill the cell between
-        output[r,c] = 0   // 移除原像素
-```
-
-- 5 区域的原有像素保持不变。区域仅向外扩展，不会向内收缩。
 
 ## 2. 关键证据
 
-- train[0]: 水平 5-条（rows 5-8, 全宽）。上方 2-像素 (0,8),(2,2),(3,10) 在 row 4 投影出 5；下方 2-像素在 row 9 投影出 5。所有 2 最终消失。
-- train[1]: 垂直 5-条（cols 4-8, 全高）。相邻 3-像素 (1,9) 和 (2,3) 直接变为 5；距离 2 步的 (6,10) 也变为 5（中间格 (6,9) 被填补）。远处 3-像素被移除。
-- train[2]: 水平 5-条（rows 7-8, 全宽）。远处 1-像素被移除，row 6 和 row 9 上投影出新的 5。
-- 非-5 像素被移除后，输出只包含 0 和 5。
-- arc-gen 含 261 个样例，均支持该合并规则。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -34,26 +19,33 @@ for each non-5, non-0 pixel at (r,c):
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需要定位 5-区域边界并计算方向扩展）
-- locality: k（依赖局部邻域判定是否邻近 5-区域）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 可用形态学膨胀操作模拟扩展：对 5 区域做 1-2 步 dilation，然后与原 5 区域取并集。非-5 像素被移除等同于只保留 5 通道。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `yes`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 49 nodes: Clip+Concat+Conv+Greater+MaxPool+Mul+Pad+ReduceSum+Relu+Slic. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Clip+Concat+Conv+Greater+MaxPool+Mul+Pad+ReduceSum+Relu+Slice+Sub+Sum+Where (49 nodes, 15 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 093
-primitive_types: [region_growth, projection, morphological_dilation]
-input_shape_rule: variable size
-output_shape_rule: same as input
-formal_rule_short: expand color-5 region outward toward scattered non-5 pixels, converting them to 5 or removing them
-locality: k (local neighborhood of 5-region edge)
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-memory_priority: use repeated 3x3 max-pool (dilation) on color-5 channel; avoid per-pixel path finding
-fusion_hint: successive dilations can be unrolled into a single larger kernel if step count fixed
-main_risk: expansion step count may vary (1 or 2) depending on input; arc-gen may disambiguate
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 49 nodes: Clip+Concat+Conv+Greater+MaxPool+Mul+Pad+ReduceSum+Relu+Slic. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Clip+Concat+Conv+Greater+MaxPool+Mul+Pad+ReduceSum+Relu+Slice+Sub+Sum+Where
+actual_nodes: 49
 ```

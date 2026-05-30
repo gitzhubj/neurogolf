@@ -33,29 +33,33 @@ for each cell (r,c):
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: global (反射需要全局信息)
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 很难用纯 Conv 实现。反射填充需要全局位置感知。
-- 可考虑: (1) 用 Conv 检测 9 区域边界和矩形范围；(2) 用坐标 transform 实现反射映射，即 `out[r,c] = in[reflect_r(r), reflect_c(c)]`；(3) 将 9 区域的输出替换为反射位置的像素值。
-- 注意保留非 9 区域的原始值(即非 9 区域 output = input)。
-- 避免大量中间张量：用 mask 合并输入和反射结果。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (18 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: ArgMax+Cast+Equal+Max+Mod+Pad+Slice+Transpose...
+
+Baseline 实际架构: ArgMax+Cast+Equal+Max+Mod+Pad+Slice+Transpose (18 nodes, 13 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 074
-primitive_types: [mirror_reflection, inpainting, symmetry_completion]
-input_shape_rule: 30x30
-output_shape_rule: 30x30
-formal_rule_short: Replace maroon(9) rectangular patches with mirror-reflected content from surrounding area
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-memory_priority: Generate reflection coordinates as indices, not as large intermediate tensors
-fusion_hint: Detect 9-region bounding box, compute reflection mapping, apply via gather-like operation
-main_risk: Determining reflection axis per example
-confidence: high
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (18 nodes). Study baseline directly.
+fusion_hint: Ops used: ArgMax+Cast+Equal+Max+Mod+Pad+Slice+Transpose...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: ArgMax+Cast+Equal+Max+Mod+Pad+Slice+Transpose
+actual_nodes: 18
 ```

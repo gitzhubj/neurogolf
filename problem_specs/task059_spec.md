@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv（区域级颜色查表，基于坐标位置决定填充色）
-- locality: 0
-- single_linear_conv_possible: probably（1x1 Conv 可学习每个位置的投票权重）
-- recommended_kernel: 1x1
-- nonlinearity_needed: no（纯线性加权投票 + argmax，但需要 softmax/argmax）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 20 nodes: Cast+Conv+Greater+MatMul+Mul+Pad+ReduceMax+ReduceSum+Reshape. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Conv+Greater+MatMul+Mul+Pad+ReduceMax+ReduceSum+Reshape+Slice+Sub+Sum+Where (20 nodes, 19 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 059
-primitive_types: [region_voting, majority_color, block_fill]
-input_shape_rule: fixed 11x11
-output_shape_rule: fixed 11x11
-formal_rule_short: for each 3x3 sub-region bounded by gray lines, fill with the dominant non-zero non-gray color or 0
-locality: 0
-single_linear_conv_possible: probably
-recommended_architecture: single_1x1_conv
-main_risk: tie-breaking rule for multi-color regions uncertain
-confidence: medium
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 20 nodes: Cast+Conv+Greater+MatMul+Mul+Pad+ReduceMax+ReduceSum+Reshape. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Conv+Greater+MatMul+Mul+Pad+ReduceMax+ReduceSum+Reshape+Slice+Sub+Sum+Where
+actual_nodes: 20
 ```

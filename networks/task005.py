@@ -1,21 +1,27 @@
-"""Task 005 - 21x21->21x21 multi-object pattern tiling (STUB: identity only)"""
-import sys
+"""Task 005 — 核心变换：对左右两个 3x3 图案做逐像素逻辑 AND。输出 3x3，仅当左右对应位置均为 1 时输出 2，否则输出 0。
+
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
+"""
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
 
-def weight_fn(ch_out, ch_in, kernel_coord):
-    """Stub: single 1x1 Conv identity. Replace with actual implementation."""
-    if kernel_coord == (0, 0) and ch_out == ch_in:
-        return 1.0
-    return 0.0
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
 
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(weight_fn, kernel_size=1)
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task005.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 5

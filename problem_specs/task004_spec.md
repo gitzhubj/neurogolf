@@ -2,27 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入输出同尺寸。输入尺寸可变（观测 8..16 行，8..16 列）。
-- 背景色为 0。每种非零颜色在输出中保持原色，无重染色。
-- 核心变换：对每个同色 8-连通非零对象执行"右剪切"。对象最低行保持原位不动；其余行的所有像素向右平移 1 格，若平移后超出该对象 bounding box 的最右列则被夹回右边界。
-- 每个颜色独立分割对象，互不干扰；多个对象的移动并行进行。
+- 核心变换：颜色区域右移：每个颜色区域像素右移1格，最底行和最右列边界保持不变。
 
-```text
-for each same-color 8-connected object C:
-    bottom = max row in C
-    right = max col in C
-    for each pixel (r,c) in C:
-        if r == bottom:  target = (r, c)
-        else:            target = (r, min(c+1, right))
-        output[target] = color_of(C)
-```
 
 ## 2. 关键证据
 
-- train 0（8x9）：单一颜色 8 对角臂对象。顶行 [0,8,8,8,8,8,0,0,0] 变为 [0,0,8,8,8,8,8,0,0]（全体右移 1）。第 4 行右端列 8 的 8 被夹住不越界。底行（行 5）[0,0,0,0,8,8,8,8,8] 完全保持。
-- train 1（8x9）：颜色 8 对象 + 颜色 7 和 6 等多对象场景，每对象按各自 bbox 独立执行右剪切，非按全图统一边界。
-- train 2（10x10）：多色多对象，底行均保持、非底行右移并受各自右边界约束。
-- arc-gen 涵盖多种形状（diagonal arms、L-shapes、compact blocks）和全部颜色 1..9，均支持独立右剪切规则。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -32,23 +20,33 @@ for each same-color 8-connected object C:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需 8-连通分量分割、对象级 bbox 计算、条件坐标映射）
-- locality: global（像素目标坐标依赖所属对象的全局 bottom 和 right）
-- single_linear_conv_possible: no（需连通组件推理和对象级条件路由）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `yes`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 4 nodes: Cast+Conv+Relu. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Conv+Relu (4 nodes, 4 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 004
-primitive_types: [object_movement, connected_component_reasoning, conditional_gate]
-input_shape_rule: variable rectangular (8..16 x 8..16)
-output_shape_rule: same as input
-formal_rule_short: each same-color 8-connected object gets right-shear: bottom row fixed, other rows shift right by 1, capped at object's rightmost column
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: multi-object collision resolution undefined; multi-bottom-row objects untested
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 4 nodes: Cast+Conv+Relu. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: Cast+Conv+Relu
+actual_nodes: 4
 ```

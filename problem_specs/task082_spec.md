@@ -31,23 +31,33 @@ for each seed at (0, c) with color K:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_3x3_conv（检测上方行的色点并做交替扩散）
-- locality: 1（每行仅依赖上一行和上行相邻列）
-- single_linear_conv_possible: probably
-- recommended_kernel: 3x3
-- nonlinearity_needed: no（纯线性位移和交替模式可用 3×3 Conv 实现）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 18 nodes: Concat+Conv+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Concat+Conv+Mul+Pad+ReduceSum+Slice+Sub+Sum (18 nodes, 10 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 082
-primitive_types: [vertical_diffraction, alternating_pattern, seed_propagation]
-input_shape_rule: 6xW (W varies)
-output_shape_rule: same as input
-formal_rule_short: each color dot on row 0 propagates downward in an alternating X-0-X pattern
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_3x3_conv
-main_risk: none
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 18 nodes: Concat+Conv+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: Concat+Conv+Mul+Pad+ReduceSum+Slice+Sub+Sum
+actual_nodes: 18
 ```

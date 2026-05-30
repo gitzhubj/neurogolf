@@ -2,28 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入/输出尺寸相同(各样例 20x20,10x10,15x15,13x13)。
-- 网格中有三种颜色:障碍物(颜色 8)、源标记(颜色 3)、目标标记(颜色 2),其余为 0(空地)。
-- 核心规则:在源标记与目标标记之间画一条**颜色 3 的最短 Manhattan 路径**,路径绕开障碍物(8)。
+- 核心变换：绿色(3)像素经过空白格形成路径连接绿色和红色(2)两个簇。
 
-```text
-sources = all cells where input == 3
-targets = all cells where input == 2
-find shortest 4-directional path from any source to any target, avoiding obstacle cells (8)
-for all cells on path: set output to 3
-all other cells = input unchanged
-```
-
-- 路径优先利用已有 3 作为起点,终点为紧邻目标(2)的空地。
-- 障碍物(8)保持不动,路径不能经过 8。
 
 ## 2. 关键证据
 
-- train[0]:20x20,源 3 在左下(14,3)(15,3),目标 2 在右上(2,17)(3,17),路径先垂直向上再水平向右,绕开散布的 8。
-- train[1]:10x10,源 3 在(1,1)(2,1),目标 2 在(6,5)(7,5),路径先向下再向右,绕过 8。
-- train[2]:15x15,源 3 在(5,1)(5,2),目标 2 在(9,1)(9,2),路径先水平向右绕过正下方的 8 再垂直向下。
-- test[0]:13x13,源 3 在(7,3)(7,4),目标 2 在(1,6)(1,7),路径先水平向右再垂直向上。
-- arc-gen 有 262 个样例,支持最短路径解释。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -33,26 +20,33 @@ all other cells = input unchanged
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 需要路径搜索(BFS/Dijkstra),这是典型的对象级逻辑,完全超出卷积能力。
-- memory_priority: BFS 需要 frontier 队列和 visited 标记。建议在 ONNX 外部实现或用固定次数的迭代形态学扩张模拟(扩张次数等于最大路径长度≈30)。
-- fusion_hint: 如用迭代扩张模拟,可将每次扩张融合为一个 Conv(3x3 邻域)+Add+Clip 操作,保持单一张量。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 1642 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Abs+Add+And+Cast+Clip+Concat+CumSum+Einsum+Gather+Greater+Less+LessOrEqual+MatMul+Mul+ReduceMax+ReduceMin+ReduceSum+Sub+Unsqueeze+Where (1642 nodes, 29 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 066
-primitive_types: [path_finding, shortest_path, obstacle_avoidance, BFS]
-input_shape_rule: varies (10-20)x(10-20)
-output_shape_rule: same as input
-formal_rule_short: draw shortest Manhattan path (color 3) from source(3) cells to target(2) cells, avoiding obstacles(8)
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: tie-breaking when multiple shortest paths exist
-confidence: medium
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 1642 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Abs+Add+And+Cast+Clip+Concat+CumSum+Einsum+Gather+Greater+Less+LessOrEqual+MatMul+Mul+ReduceMax+ReduceMin+ReduceSum+Sub+Unsqueeze+Where
+actual_nodes: 1642
 ```

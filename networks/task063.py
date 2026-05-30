@@ -1,19 +1,27 @@
-"""Task 063 — Flood-fill: fill 0-cells enclosed by wall-color (cannot
-reach edge via 4-neighbor) with color 3.
+"""Task 063 — 核心变换：浅蓝(8)为墙红(2)标识外部，绿(3)填充被墙包围且与红区隔离的内部空白格。
 
-Stub: Infeasible with simple Conv. Requires global flood-fill /
-connectivity analysis. While iterative morphological dilation (3x3 Conv +
-threshold) could approximate this, the number of iterations needed varies
-per example (depends on cavity size), and the approach requires prohibited
-Loop/Scan or runtime-variable iteration count. Opset 10 without control
-flow cannot implement conditional iterative propagation.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task063.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 63

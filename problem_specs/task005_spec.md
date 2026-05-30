@@ -29,30 +29,33 @@ for r in 0..2, c in 0..2:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv 或固定坐标路由（左右半部 AND 可用 fixed-weight 1x1 Conv 实现）
-- locality: 9（每个输出格依赖两个固定偏移的输入格：同 col 和 col+4）
-- single_linear_conv_possible: probably（如果允许以固定稀疏权重选取左右对应位置并相乘，1x1 Conv 可近似实现，但严格的 AND 非线性（1 AND 1 = 2 而非 1）可能需要非线性映射）
-- recommended_kernel: 1x1（颜色映射层面）
-- nonlinearity_needed: yes（AND 运算需要非线性；且输出颜色 2 不是简单的线性组合）
+> **以下内容已根据 baseline ONNX 验证方案修正**
 
-极简颜色映射：
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `yes`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 106 nodes: And+Cast+Conv+Gather+Greater+Mul+Or+Pad+ReduceMax+Relu+Slice. Study baseline for optimal op sequence.
 
-```text
-output_channel_2 = input_channel_1_left * input_channel_1_right  (AND 逻辑)
-output_channel_0 = 1 - output_channel_2                         (背景)
-```
+Baseline 实际架构: And+Cast+Conv+Gather+Greater+Mul+Or+Pad+ReduceMax+Relu+Slice+Squeeze+Sub+Sum+Transpose+Where (106 nodes, 19 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 005
-primitive_types: [pattern_split, logical_AND, pixelwise_color_mapping]
-input_shape_rule: fixed 3x7 with col 3 = 5 as separator
-output_shape_rule: fixed 3x3
-formal_rule_short: split input at col 3, AND left 3x3 with right 3x3, output 2 for AND=1 and 0 otherwise
-locality: 9
-single_linear_conv_possible: probably (fixed sparse linear + nonlinear)
-recommended_architecture: single_1x1_conv (with post-Conv nonlinear map)
-main_risk: output color 2 mapping might require nonlinear activation
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 106 nodes: And+Cast+Conv+Gather+Greater+Mul+Or+Pad+ReduceMax+Relu+Slice. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: And+Cast+Conv+Gather+Greater+Mul+Or+Pad+ReduceMax+Relu+Slice+Squeeze+Sub+Sum+Transpose+Where
+actual_nodes: 106
 ```

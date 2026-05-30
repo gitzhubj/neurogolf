@@ -32,26 +32,33 @@ output = quadrant containing the anomaly pixel
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 需要检测十字(统计每行/列的颜色一致性)、定位异色像素、计算包含象限。这不是卷积能解决的问题。
-- memory_priority: 将十字位置(行号、列号)和异色位置作为标量存储,直接裁剪输出区域,避免生成全尺寸 mask。
-- fusion_hint: 裁剪操作用 Slice/StridedSlice 实现,只需一次复制。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 36 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Add+And+Cast+Div+Gather+Greater+Less+Mul+Pad+ReduceMax+ReduceSum+Slice+Squeeze+Sub+Where (36 nodes, 12 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 065
-primitive_types: [cross_detection, quadrant_extraction, anomaly_detection, cropping]
-input_shape_rule: varies (5-13)x(5-13)
-output_shape_rule: one quadrant = (cross_row or H-1-cross_row) x (cross_col or W-1-cross_col)
-formal_rule_short: find cross (full row + full column of same color), extract quadrant containing the unique contrasting pixel
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: none
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 36 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Add+And+Cast+Div+Gather+Greater+Less+Mul+Pad+ReduceMax+ReduceSum+Slice+Squeeze+Sub+Where
+actual_nodes: 36
 ```

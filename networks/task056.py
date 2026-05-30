@@ -1,16 +1,27 @@
-"""Task 056 — 3x3 pattern (X, cross, L) classification → output 1x1 color.
+"""Task 056 — 核心变换：连通分量计数：统计非零像素4-连通分量个数，1个->6，2个->3，3个->1，5个->2。
 
-Stub: Infeasible with simple Conv. Requires: (1) shape classification of
-3x3 non-zero mask (X-shape, cross, L-shape), (2) shape-to-color lookup.
-Shape classification is inherently non-linear and pattern-dependent,
-not expressible by Conv under opset 10 constraints.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task056.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 56

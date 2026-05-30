@@ -1,32 +1,30 @@
-"""Task 032 — ANALYSIS STUB.
+"""Task 032 — 核心变换：所有非零像素列内垂直下落到底部(重力效果)，保持列内相对顺序。
 
-From spec: Per-column gravity. For each column independently, collect all
-non-zero pixels preserving top-to-bottom order, then stack them at the
-bottom of the column. Same input/output size. Example: 4x4 input → 4x4 output.
-
-NOT CONV-AMENABLE: Requires per-column counting and reordering of pixels.
-No convolutional kernel can perform dynamic column-level sorting.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 032: per-column gravity requires column-level sorting of "
-        "non-zero pixels — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task032.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 32
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

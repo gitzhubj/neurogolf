@@ -24,23 +24,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需要区域检测 + 射线投影）
-- locality: global（投影线可横跨整个区域）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 118 nodes: And+Cast+Conv+CumSum+Equal+Gather+Greater+Max+MaxPool+Mul+Or. Study baseline for optimal op sequence.
+
+Baseline 实际架构: And+Cast+Conv+CumSum+Equal+Gather+Greater+Max+MaxPool+Mul+Or+ReduceMax+Sub+Sum+Where (118 nodes, 16 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 054
-primitive_types: [region_detection, ray_casting, crosshair_drawing]
-input_shape_rule: same as output
-output_shape_rule: same as input
-formal_rule_short: for each special-colored cell, draw crosshair lines in all 4 directions until hitting boundary color
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: color priority at line intersections uncertain
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 118 nodes: And+Cast+Conv+CumSum+Equal+Gather+Greater+Max+MaxPool+Mul+Or. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: And+Cast+Conv+CumSum+Equal+Gather+Greater+Max+MaxPool+Mul+Or+ReduceMax+Sub+Sum+Where
+actual_nodes: 118
 ```

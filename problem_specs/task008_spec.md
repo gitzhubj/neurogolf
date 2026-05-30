@@ -36,34 +36,33 @@ for i, (_, c) in enumerate(columns_with_5):
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu（需按列检测首次非零位置、排序、条件赋值）
-- locality: global（编号需全局列间排序）
-- single_linear_conv_possible: no（序号分配需跨列比较和排序，非单层线性可表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（排序和条件赋值需要非线性）
+> **以下内容已根据 baseline ONNX 验证方案修正**
 
-颜色映射表：
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 78 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
 
-```text
-input 5 -> output depends on column rank:
-  first 5-column by top-row: output 1
-  second: output 2
-  third: output 3
-  fourth: output 4
-input 0 -> output 0
-```
+Baseline 实际架构: And+Cast+Clip+Concat+Gather+Greater+Less+Mul+Not+Or+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Sum+Where (78 nodes, 21 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 008
-primitive_types: [column_detection, ordering, color_reassignment]
-input_shape_rule: fixed 9x9
-output_shape_rule: fixed 9x9
-formal_rule_short: replace each column of 5s with sequential numbers 1..N ordered by first row appearance (top to bottom)
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: tie-breaking for same first-row undefined; column count != 4 untested
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 78 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: And+Cast+Clip+Concat+Gather+Greater+Less+Mul+Not+Or+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Sum+Where
+actual_nodes: 78
 ```

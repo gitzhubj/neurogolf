@@ -1,23 +1,27 @@
-"""Task 058 — Generate spiral maze pattern from all-zero input.
+"""Task 058 — 核心变换：递归方形螺旋：全零输入生成绿色(3)方形递归螺旋边框图案。
 
-Stub: Input is all zeros (color 0 across the whole grid). The maze output
-depends on the grid dimensions (H×W), which varies per example (5x5 up to
-20x20). Since the (1,10,30,30) input encoding differs per grid size
-(channel 0 = 1.0 spans different areas), the network must detect
-dimensions and algorithmically generate the maze. This requires iterative
-spiral generation logic that is infeasible with Conv+element-wise ops
-in opset 10 (no Loop/Scan allowed).
-
-A Constant-based output cannot handle varying grid sizes. A single
-network with fixed weights cannot generate different maze patterns for
-different H×W combinations without prohibited control flow.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task058.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 58

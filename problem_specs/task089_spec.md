@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需识别图案、匹配锚点、复制粘贴）
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 181 nodes: Cast+Concat+Conv+Gather+Greater+MaxPool+Mul+Pad+ReduceSum+Sl. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Gather+Greater+MaxPool+Mul+Pad+ReduceSum+Slice+Sub+Sum (181 nodes, 25 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 089
-primitive_types: [pattern_copy, marker_anchor, stamp_operation]
-input_shape_rule: fixed 13x13
-output_shape_rule: fixed 13x13
-formal_rule_short: copy source pattern to marker locations, using marker color as anchor alignment
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: multi-pattern multi-marker matching ambiguous
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 181 nodes: Cast+Concat+Conv+Gather+Greater+MaxPool+Mul+Pad+ReduceSum+Sl. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Concat+Conv+Gather+Greater+MaxPool+Mul+Pad+ReduceSum+Slice+Sub+Sum
+actual_nodes: 181
 ```

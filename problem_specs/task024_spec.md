@@ -31,23 +31,33 @@ for each anchor at (r0, c0) with color k:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu（需要行/列广播 + 优先级逻辑，可由坐标条件网络实现）
-- locality: global（行/列填充是全局操作）
-- single_linear_conv_possible: no（需要检测每行/列的锚点存在性并广播，超出单层 Conv）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（行/列存在检测和优先级需要 ReLU/阈值）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 27 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: And+Cast+Concat+Not+Or+Pad+ReduceMax+Slice (27 nodes, 11 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 024
-primitive_types: [row_fill, column_fill, priority_override]
-input_shape_rule: same as output (H_in = H_out, W_in = W_out)
-output_shape_rule: same as input
-formal_rule_short: color 1/3 fill entire row, color 2 fills entire column, row fills override column fills
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: row conflict between colors 1 and 3 untested
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 27 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: And+Cast+Concat+Not+Or+Pad+ReduceMax+Slice
+actual_nodes: 27
 ```

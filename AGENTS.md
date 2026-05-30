@@ -2,94 +2,260 @@
 
 ## 角色
 
-你是世界顶级的神经网络压缩专家，精通 ARC-AGI 抽象推理任务。你正在参加 IJCAI-ECAI 2026 NeuroGolf Championship，目标是：**为每个 ARC-AGI 任务构建能 100% 通过所有测试用例的 ONNX 神经网络，并使参数量+内存占用尽可能小**。
+你是世界顶级的神经网络压缩专家，精通 ARC-AGI 抽象推理任务。你正在参加 IJCAI-ECAI 2026 NeuroGolf Championship，目标是：**在 baseline 方案基础上持续优化，为每个任务找到比 baseline 更小的 ONNX 网络（更少的 `memory_bytes + params`），同时保持 100% 测试通过率**。
+
+你已有 400 个 baseline ONNX 文件和对应的 `networks/taskXXX.py` 源码。你的工作是：**阅读 → 理解 → 优化 → 验证 → 迭代**。
+
+---
 
 ## 技术规格
 
-- **输入格式**：ARC grid 2D 数组（颜色 0-9），转换为 one-hot 张量 `(1, 10, 30, 30)` → batch × 10 channels × height × width
-- **ONNX 版本**：IR version 10, opset 10
+- **输入格式**：one-hot `(1, 10, 30, 30)` — batch × 10 channels × height × width
+- **ONNX 版本**：IR version 8-10, opset 10-13
 - **数据类型**：FLOAT（`onnx.TensorProto.FLOAT`）
 - **算子黑名单**：Loop, Scan, NonZero, Unique, Script, Function, Compress
-- **文件大小限制**：≤ 1.44 MB (1,509,949 bytes)
+- **文件大小限制**：≤ 1.44 MB
 - **评分**：`points = max(1.0, 25.0 - ln(max(1.0, memory_bytes + params)))`
-- **测试集**：train + test (ARC-AGI) + arc-gen (ARC-GEN-100K，每个任务几十到几百个) + 私有测试集
+- **验证标准**：`verify_network()` 自动逐像素比对，全用例 100% 一致才算通过
 
-## 工作流程
+---
+
+## 核心工作流：从 baseline 出发，持续优化
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 起点：400 个 networks/taskXXX.py（从 baseline ONNX 转换）     │
+│ 目标：在保持 100% 通过率的前提下，降低 memory_bytes + params  │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ### 对每个任务执行此循环：
 
-1. **构建基线网络**
-   - 使用 `tools/local_runner.py --task N` 快速验证
-   - 分析 train 用例的输入→输出变换规律，必要时参考 `input/task{id}.json`
-   - 优先手工设计权重，架构从简到复杂：1×1 Conv → 3×3 Conv → 多层
-   - 在本地用 `neurogolf_utils.verify_network(network, task_num, examples)` 验证
+```
+Step 1: 阅读现有方案
+├── networks/taskXXX.py     ← 当前最优方案（初始 = baseline 翻译）
+├── problem_specs/taskXXX_spec.md  ← 变换规则说明
+├── BASELINE_TECHNIQUES.md  ← 算子模式速查
+└── thinking/taskXXX_thinking.md   ← 历史优化记录（如有）
 
-2. **生成思考日志** → `thinking/task{id}_thinking.md`
-   ```markdown
-   # 任务 {id} 思考日志
-   ## Round 1 — 基线
-   ### 任务分析（变换规律、grid 尺寸、涉及的颜色通道）
-   ### 基线快照（架构、参数量、内存、cost、通过情况）
-   ### 观察
-   ### 实验
-   ### 下一步
-   ```
+        │
+        ▼
 
-3. **迭代优化** → 每轮更新思考日志
-4. **输出** → 最终 ONNX 放 `onnx_export/task{id:03d}.onnx`，提 PR
+Step 2: 分析优化空间
+├── 当前方案的 cost (params + memory) 是多少？
+├── baseline 用的什么算子？有没有更轻量的替代？
+│   - Gather 替代 1×1 Conv？（省 90% params）
+│   - Slice+Pad 替代 3×3 Conv？（省 96% params）
+│   - Transpose 替代旋转？（0 params）
+│   - 减少通道数？缩小 kernel？
+├── 有没有冗余的 Constant / 中间张量？
+└── 对比其他相似任务的方案，有无可复用的优化模式？
 
-## 官方工具 API (neurogolf_utils)
+        │
+        ▼
 
-```python
-import sys
-sys.path.insert(0, 'tools')
-import neurogolf_utils as nu
+Step 3: 生成优化方案
+├── 修改 networks/taskXXX.py 中的 build() 函数
+├── 尝试 1-2 个优化方向（不要一次改太多）
+└── 保留原方案作为注释备份
 
-# 加载测试数据
-examples = nu.load_examples(task_num)  # → dict with "train", "test", "arc-gen"
+        │
+        ▼
 
-# 构建单层 Conv2D 网络（最常用）
-def weight_fn(channel_out, channel_in, kernel_coord):
-    # channel_out: 0..9 (输出通道/颜色)
-    # channel_in:  0..9 (输入通道/颜色)
-    # kernel_coord: (row_offset, col_offset)，如 (0,0) 是中心
-    # kernel_size=1 → 仅 (0,0)；kernel_size=3 → (-1,-1)..(1,1)
-    return 0.0
+Step 4: 本地验证
+├── python networks/taskXXX.py
+├── verify_network 自动运行 train + test + arc-gen
+│
+├── ✓ 100% 通过 → Step 5
+└── ✗ 有失败 → debug_compare() 分析失败用例 → 修正 → 回到 Step 3
 
-network = nu.single_layer_conv2d_network(weight_fn, kernel_size=1)
+        │
+        ▼
 
-# 端到端验证（保存 ONNX、推理、输出结果）
-nu.verify_network(network, task_num, examples)
+Step 5: 本地对比评估
+├── 新 cost < 旧 cost？ → git commit + git push → 创建 PR
+├── 新 cost >= 旧 cost？ → 记录尝试，放弃此方向
+└── 已达理论下界？ → 标记 DONE，转向下一个任务
 
-# 数据转换
-tensor = nu.convert_to_numpy(example)    # ARC grid → one-hot (1,10,30,30)
-grid   = nu.convert_from_numpy(tensor)   # one-hot → ARC grid
+        │
+        ▼
 
-# 评分计算（内部使用 ONNX Runtime Profiler 精确测量内存）
-# verify_network 内部调用 score_network → calculate_memory + calculate_params
+Step 6: GitHub CI → Kaggle 自动提交（自动化流水线）
+├── git push → 创建 PR
+├── GitHub Actions 自动触发 pr-validate.yml：
+│   ├── ONNX 合规性检查（算子黑名单、文件大小）
+│   ├── 正确性验证（跑测试用例）
+│   └── cost 对比（与 task_registry.json 比较）
+├── cost 改善 → 自动合并 PR → 触发 merge-to-main.yml：
+│   ├── 更新 task_registry.json
+│   └── 打包所有 ONNX → 自动提交 Kaggle
+└── cost 未改善 → PR 评论原因 → 不合并
+
+        │
+        ▼
+
+Step 7: 获取 Kaggle 分数 → 观察 → 写入思考日志
+├── python tools/submit_tracker.py --fetch     # 拉取最新分数
+├── python tools/submit_tracker.py --history   # 对比历史 delta
+├── score ↑ → 确认优化有效，thinking log 记录
+├── score ↓ → 分析原因，可能需要回滚
+└── 将 Score Tracking 写入 thinking/taskXXX_thinking.md
+
+        │
+        ▼
+
+Step 8: 迭代
+├── 还有可优化的维度？ → 回到 Step 2
+├── 3 轮无改善？ → 标记 STUCK，转向其他任务
+└── 记录 thinking/taskXXX_thinking.md（Round N 格式）
 ```
 
-## 权重组装模式
+### 🔄 完整 CI/CD 流水线（自动化）
 
-- **恒等映射**：`if channel_out == channel_in and kernel_coord == (0,0): return 1.0`
-- **颜色替换**：`if channel_in == A and channel_out == B and kernel_coord == (0,0): return 1.0`
-- **颜色清除**：`if channel_in == X and channel_out == Y and kernel_coord == (0,0): return -1.0`（需配合其他规则）
-- **邻域扩散**：在非 (0,0) 的 kernel_coord 上设非零值（如边缘检测、腐蚀/膨胀）
-- **去 bias**：单层 Conv 默认无 bias，无需额外处理
+```
+开发者本地                    GitHub Actions                     Kaggle
+  │                              │                                │
+  │ 修改 networks/taskXXX.py     │                                │
+  │ python networks/taskXXX.py   │                                │
+  │ verify_network ✓             │                                │
+  │                              │                                │
+  │ git add networks/ thinking/  │                                │
+  │ git commit -m "opt: ..."     │                                │
+  │ git push → 创建 PR           │                                │
+  │ ────────────────────────────>│                                │
+  │                              │ pr-validate.yml 触发           │
+  │                              │ ├─ validate_onnx ✓            │
+  │                              │ ├─ test_network ✓             │
+  │                              │ └─ compare_cost (改善?)       │
+  │                              │                                │
+  │                              │ cost 改善 → 自动合并 PR        │
+  │                              │                                │
+  │                              │ merge-to-main.yml 触发         │
+  │                              │ ├─ update_registry.py          │
+  │                              │ ├─ 打包 ONNX → submission.zip  │
+  │                              │ └─ kaggle_submit.py ──────────>│
+  │                              │                                │ 评分
+  │                              │  <── 提交完成 ────────────────│
+  │                              │                                │
+  │ python tools/submit_tracker  │                                │
+  │   --fetch  # 拉取最新分数    │                                │
+  │  <── score: 38.59 ──────────│                                │
+  │                              │                                │
+  │ 更新 thinking log            │                                │
+  │ → 下一轮迭代                 │                                │
+```
 
-## 优化技巧
+### 📊 分数反馈命令
 
-### 架构层面
-- 优先 1×1 Conv（只需 `_CHANNELS × _CHANNELS = 100` 个参数）
-- kernel_size=3 时参数为 `10 × 10 × 9 = 900`
-- 单层能解决就不加层（多层增加中间激活内存）
+```bash
+python tools/submit_tracker.py --check    # 检测本地 ONNX 变更
+python tools/submit_tracker.py --fetch    # 拉取 Kaggle 最新分数（CI 已提交）
+python tools/submit_tracker.py --history  # 查看提交历史和分数趋势
+```
 
-### 权重层面
-- 整数权重（1.0, -1.0, 0.0）确保精确计算
-- 通道重排：活跃通道集中到前几个索引，删除尾部全零通道
-- 对称性利用：如果变换有方向对称性，用更少的核覆盖
+**说明**：
+- CI 自动提交 Kaggle 后，用 `--fetch` 获取最新分数
+- 每个任务 score 上限 25.0，公式 `max(1.0, 25.0 - ln(memory + params))`
+- **每次 PR 只包含 1-3 个任务**，便于精确归因分数变化
+```
 
-### 验证层面
-- 全用例 100% 像素一致（`verify_network` 自动逐像素比对）
-- `convert_from_numpy` 中：多个颜色 → 标记为 "too many colors"（11），无颜色 → 标记为 "no color"（10），即为错误
-- arc-gen 用例数远超 train+test，是关键验证
+**评分说明**：
+- Kaggle 返回的是 **public score**（所有提交文件的分数总和）
+- 单次提交含多个任务时，分数变化为所有变更任务的贡献之和
+- 建议每次只提交 **1-3 个优化过的任务**，便于精确归因
+- 每个任务的 score 上限为 25.0，计算公式 `max(1.0, 25.0 - ln(memory + params))`
+
+### 任务优先级
+
+1. **先扫描**：`python tools/task_scanner.py --top 20` 获取最简单任务
+2. **Tier 1 优先**：Gather/Transpose/Slice-Pad/单Conv（30个）→ 优化空间大
+3. **Tier 2 其次**：Gather空间/Slice多步（10个）
+4. **Tier 5 最后**：Conv逻辑/Reduce+Where（360个）→ 逐個攻克
+5. **可以放弃**：3 轮无改善 → 标记 STUCK → 转下一个
+
+---
+
+## 优化技巧目录
+
+### 第一层：算子替换（最大收益）
+
+| 当前方案 | 替换为 | 节省 |
+|---|---|---|
+| 1×1 Conv (100p) 做颜色映射 | Gather(axis=1) (10p) | 90% |
+| 3×3 Conv (900p) 做平移 | Gather(axis=2/3) (30p) | 96% |
+| Conv 做旋转/镜像 | Transpose (0p) | 100% |
+| Conv+mask 做裁剪 | Slice+Pad (6p) | 98% |
+| Conv 做翻转 | Slice(step=-1)+Pad (4p) | 99% |
+
+### 第二层：架构精简
+
+- **减少通道数**：输出通道从 10 减到实际使用的 k 个
+- **合并 Constant**：多个 Constant 如果语义独立可尝试合并
+- **去掉中间 ReLU**：如果不需要非线性，去掉 ReLU 节省内存
+- **合并 Conv 层**：两层 1×1 Conv 可数学合并为一层
+- **权重稀疏化**：将零权重集中到通道尾部
+
+### 第三层：数值优化
+
+- **整数权重**：1.0, -1.0, 0.0 确保精确计算
+- **减少初始值精度**：整数索引用 INT64，浮点权重用 FLOAT
+- **共享 Constant**：多个算子复用同一个 Constant 张量
+
+### 第四层：黑魔法
+
+- **AND/OR 逻辑门**：`ReLU(A+B-1.5)*2` 替代多层 Conv
+- **Clip via ReLU**：`x - ReLU(x-1.0)` 裁剪到 [0,1]
+- **位置编码 Constant**：预置坐标信息，避免动态计算
+- **通道复用**：一个通道承载多种语义
+
+---
+
+## 参考资源
+
+| 资源 | 路径 | 用途 |
+|---|---|---|
+| 当前方案 | `networks/taskXXX.py` | 优化起点 |
+| 变换规则 | `problem_specs/taskXXX_spec.md` | 理解任务需求 |
+| 算子模式 | `BASELINE_TECHNIQUES.md` | 知道有哪些优化方向 |
+| 搭建指南 | `NETWORK_BUILDING_GUIDE.md` | 代码模板和调试技巧 |
+| 历史思考 | `thinking/taskXXX_thinking.md` | 避免重复尝试 |
+| 任务扫描 | `python tools/task_scanner.py` | 优先级排序 |
+
+## 思考日志格式（强制执行）
+
+```markdown
+# 任务 XXX 思考日志
+
+## Round 1 — Baseline 分析
+- Baseline cost: params=X, memory=Y, cost=Z, score=S
+- Baseline 架构: [算子列表]
+- 观察: [优化空间分析]
+- 优化方案: [计划尝试的方向]
+
+## Round 2 — 优化尝试
+- 修改: [具体改了什么]
+- 结果: cost 变化, 通过率
+- 结论: [成功/失败原因]
+- 下一步: [继续优化 or 标记 DONE/STUCK]
+```
+
+---
+
+## 辅助工具速查
+
+```bash
+# 扫描任务优先级
+python tools/task_scanner.py --top 20
+
+# 从 baseline 生成/更新 networks/
+python tools/onnx_to_network.py --task 16
+
+# 分析任务规则（自动检测）
+python tools/analyze_task_rules.py --tier1
+
+# 运行验证
+python networks/task016.py
+
+# 将所有 ONNX 导出到 onnx_export/
+for f in networks/task*.py; do python "$f"; done
+```

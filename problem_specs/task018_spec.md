@@ -27,24 +27,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: unknown
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 涉及尺寸变化和重复平铺, 单一卷积核无法直接实现。需要在 ONNX 中使用 Resize/upsampling 或 tile/concat 操作。如果始终保持 2x 倍率放大, 可用转置卷积(stride=2)近似。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 219 nodes: Abs+Add+And+Cast+Clip+Concat+Conv+ConvTranspose+Div+Floor+Ga. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Abs+Add+And+Cast+Clip+Concat+Conv+ConvTranspose+Div+Floor+Gather+Greater+GreaterOrEqual+Less+MatMul+MaxPool+Mul+OneHot+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Transpose (219 nodes, 31 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 018
-primitive_types: [tiling, replication, checkerboard_fill]
-input_shape_rule: variable (HxW)
-output_shape_rule: 2H x 2W
-formal_rule_short: tile input pattern in 2x2 grid, fill gaps with alternating 8/0 checkerboard
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: unknown
-main_risk: 填充规则(8/0 交替)细节不确定
-confidence: low
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 219 nodes: Abs+Add+And+Cast+Clip+Concat+Conv+ConvTranspose+Div+Floor+Ga. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Abs+Add+And+Cast+Clip+Concat+Conv+ConvTranspose+Div+Floor+Gather+Greater+GreaterOrEqual+Less+MatMul+MaxPool+Mul+OneHot+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Transpose
+actual_nodes: 219
 ```

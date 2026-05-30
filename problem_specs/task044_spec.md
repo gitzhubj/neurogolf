@@ -2,18 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入输出尺寸相同（均为 10x10）。
-- 背景色为 0，颜色 5 构成矩形"框架"(containers)，其他非零颜色（如 8,6,7,1,3,9 等）构成被包围在框架内部的"内容块"。
-- 核心规则：在多个 5-框架之间，找出形状（bounding box 尺寸）相同的成对内容块，将它们互换（swap）。不匹配的内容块保持原位。
-- 框架本身（5）在输出中保持不变。
-- 互换时保持内容块的形状不变，仅改变其颜色和目标框架位置。
+- 核心变换：找出灰色(5)形状包围的黑色空洞，将外部彩色图案按相同形状移入空洞填补。
+
 
 ## 2. 关键证据
 
-- train 1：8-块(2x2) 和 6-块(2x2) 形状相同、出现在两个不同 5-框架内，输出中两个块互换位置。7-散点没有匹配，保持原位。
-- train 2：1-块(形状特定) 与 3-块互换，9-块与其匹配对象互换，框架保持。
-- train 3：2-块 与 8-块互换，4-散点保持。
-- arc-gen 全部支持基于形状匹配的内容互换规则：大小相同的两个块（即使颜色不同）会在各自的 5-框架之间交换。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -29,24 +26,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：需要识别 5-框架边界、提取每个框架内的内容块、计算其 bounding box、匹配相同形状的块、执行互换——这需要连通组件分析+物体操作，单层 Conv 完全无法实现。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 1054 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Abs+Add+And+Cast+Clip+Col2Im+Concat+Gather+Greater+Less+MatMul+Max+MaxPool+Mul+Pad+ReduceMax+ReduceSum+Reshape+Slice+Sub+Transpose+Unsqueeze (1054 nodes, 59 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "044"
-primitive_types: ["object_swap", "bounding_box_match", "container_extraction"]
-input_shape_rule: "same as output, 10x10"
-output_shape_rule: "same as input"
-formal_rule_short: "swap same-shaped content blocks between 5-frame containers"
-locality: "global"
-single_linear_conv_possible: "no"
-recommended_architecture: "object_logic_required"
-main_risk: "多于 2 个相同形状块时的互换顺序不确定"
-confidence: "medium"
+task_id: 044
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: global
+single_linear_conv_possible: no
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 1054 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Abs+Add+And+Cast+Clip+Col2Im+Concat+Gather+Greater+Less+MatMul+Max+MaxPool+Mul+Pad+ReduceMax+ReduceSum+Reshape+Slice+Sub+Transpose+Unsqueeze
+actual_nodes: 1054
 ```

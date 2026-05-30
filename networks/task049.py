@@ -1,34 +1,30 @@
-"""Task 049 — ANALYSIS STUB.
+"""Task 049 — 核心变换：找面积最小的有色实心矩形块，以其外接矩形大小输出纯色块。
 
-From spec: Extract innermost enclosed monochrome rectangle. Input has
-nested single-color rectangular regions. Find the innermost (smallest)
-rectangle that is fully enclosed by another, and output its content.
-
-Example: 2-frame(5x7) → 8-block(3x3) → output 3x3 8-block.
-
-NOT CONV-AMENABLE: Requires nested rectangle detection, enclosure
-relationship analysis (tree), and innermost region cropping.
+架构: reduce_with_where (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_with_where)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 049: innermost rectangle extraction requires nesting "
-        "analysis and region selection — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task049.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 49
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

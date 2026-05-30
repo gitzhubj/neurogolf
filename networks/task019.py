@@ -1,21 +1,27 @@
-"""Task 019 - 2x4->4x8 2x upscale with 8/0 fill (STUB: identity only)"""
-import sys
+"""Task 019 — 核心变换: 将输入图案**复制到 2x2 平铺位置**, 并在原始图案副本之间填充颜色 8(teal)。
+
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
+"""
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
-
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
 
-def weight_fn(ch_out, ch_in, kernel_coord):
-    """Stub: single 1x1 Conv identity. Replace with actual implementation."""
-    if kernel_coord == (0, 0) and ch_out == ch_in:
-        return 1.0
-    return 0.0
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
 
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(weight_fn, kernel_size=1)
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task019.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 19

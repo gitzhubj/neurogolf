@@ -1,19 +1,27 @@
-"""Task 066 — Shortest Manhattan path from source(3) to target(2), avoiding
-obstacles(8).
+"""Task 066 — 核心变换：绿色(3)像素经过空白格形成路径连接绿色和红色(2)两个簇。
 
-Stub: Infeasible with simple Conv. Requires BFS/Dijkstra shortest-path
-search with obstacle avoidance. This is a global graph algorithm that
-cannot be implemented with Conv+element-wise ops alone. Iterative
-morphological dilation could approximate wavefront propagation, but the
-number of iterations equals the path length (varies per example) and
-requires dynamic control flow (Loop prohibited).
+架构: reduce_with_where (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_with_where)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task066.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 66

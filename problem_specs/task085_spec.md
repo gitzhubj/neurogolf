@@ -22,23 +22,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_3x3_conv（检测上下行相同颜色 → 中间行交替）
-- locality: 1
-- single_linear_conv_possible: probably
-- recommended_kernel: 3x3
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 20 nodes: Cast+Conv+Floor+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Conv+Floor+Mul+Pad+ReduceSum+Slice+Sub+Sum (20 nodes, 14 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 085
-primitive_types: [checkerboard, alternating_row, block_detection]
-input_shape_rule: same as output
-output_shape_rule: same as input
-formal_rule_short: for each 3-row solid block, make the middle row alternate between block color and 0
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_3x3_conv
-main_risk: phase of alternating pattern slightly uncertain
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 20 nodes: Cast+Conv+Floor+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: Cast+Conv+Floor+Mul+Pad+ReduceSum+Slice+Sub+Sum
+actual_nodes: 20
 ```

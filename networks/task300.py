@@ -1,0 +1,30 @@
+"""Task 300 — 核心变换：最大连通分量裁剪：找最大连通分量，裁剪输出其紧密包围盒。
+
+架构: reduce_with_where (Reduce + Where conditional)
+Baseline 参数: ?, 节点: 43
+"""
+import sys, numpy as np
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
+import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_with_where)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
+
+def build():
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task300.onnx"))
+    return model
+
+if __name__ == '__main__':
+    task_num = 300
+    examples = nu.load_examples(task_num)
+    network = build()
+    nu.verify_network(network, task_num, examples)

@@ -28,23 +28,33 @@ output = crop(input[bbox], pattern_color)
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需检测标记色位置 + 裁剪）
-- locality: global
-- single_linear_conv_possible: no（动态裁剪非单层 Conv 可表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 58 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Cast+Equal+Greater+Less+MatMul+Mul+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Sum+Where (58 nodes, 18 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 088
-primitive_types: [marker_detection, crop_to_bbox, pattern_extraction]
-input_shape_rule: HxW (varies)
-output_shape_rule: marker_bbox size
-formal_rule_short: find symmetric marker color pairs, crop pattern between them
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: marker vs pattern color ambiguity
-confidence: medium
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 58 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Cast+Equal+Greater+Less+MatMul+Mul+Pad+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Sum+Where
+actual_nodes: 58
 ```

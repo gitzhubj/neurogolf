@@ -1,17 +1,27 @@
-"""Task 067 — Find horizontal periodicity, output first period block.
+"""Task 067 — 核心变换：周期提取：输入水平重复模式周期等于行数H，输出前H列最小周期正方形。
 
-Stub: Infeasible with simple Conv. Requires: (1) scan columns to find
-minimum period N such that col[i] == col[i+N] for all i, (2) slice to
-output first N columns. Period detection requires pairwise column
-comparison across the full width, which is a global operation not
-expressible by Conv with fixed spatial kernel.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task067.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 67

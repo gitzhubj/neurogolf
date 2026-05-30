@@ -1,132 +1,40 @@
-"""Task 073 — Blue(1) at row 2 falls to row 4, swapping with gray(5).
+"""Task 073 — 核心变换：蓝色(1)像素垂直下落至底部灰色(5)行，原位置变黑。
 
-Architecture: Identity copy via 1x1 Conv, then Slice ch1 at row 2 to get
-blue_mask, position it at rows 2 and 4 via Conv(1,1) with padding, then
-Sub/Add to swap ch1 and ch5 between those two rows.
-
-Grid is 5x5 at top-left of 30x30 canvas.
+架构: single_conv (unknown)
+Baseline 参数: 910, 节点: 1
 """
 import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
 import onnx
+from onnx import helper
 
-_CHANNELS, _HEIGHT, _WIDTH = 10, 30, 30
-_GRID_SHAPE = [1, _CHANNELS, _HEIGHT, _WIDTH]
-_DATA_TYPE = onnx.TensorProto.FLOAT
-_IR_VERSION = 10
-_OPSET_IMPORTS = [onnx.helper.make_opsetid("", 10)]
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+conv_w_data = np.array([-0.410849, 0.822366, 0.155428, -0.129869, 1.22589, 0.622751, 0.111049, 1.03933, 1.02155, 0.859748, -1.78997, 0.952447, -0.144378, 1.01326, 0.952447, -0.23748, 1.01326, 0.952447, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.966554, -0.861618, -0.966554, -0.653843, -1.45956, -0.727407, -0.0135912, 0.755317, 0.255929, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0785806, -0.849991, -0.0600132, -0.534669, -0.534669, -0.534669, -0.534668, -0.534669, -0.534668, -0.534665, -0.534667, -0.534665, -0.534665, -0.53466, -0.534665, -0.534665, -0.53466, -0.534665, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1.41286, 1.26937, -1.41286, 0.129063, 0.503523, 0.191562, -0.534669, -0.534669, -0.534669, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.0733778, 1.06831, -0.322197, -0.0701317, -0.759239, 0.0532032, -0.555856, -0.555856, -0.555856, -0.792919, 1.48173, -0.940462, -0.555853, -0.555848, -0.555853, -0.555853, -0.555848, -0.555853, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.232449, -1.80718, 0.628452, 0.206004, 1.22616, 0.125873, -0.0441947, 0.403499, 0.0429661, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], dtype=np.float32)
+conv_w = helper.make_tensor(
+    name="conv_w", data_type=onnx.TensorProto.FLOAT, dims=[10, 10, 3, 3],
+    vals=conv_w_data.flatten().tolist())
+conv_b_data = np.array([-1.18852, -1.24261, -1.0, -1.0, -1.0, -1.09843, -1.0, -1.0, -1.0, -1.0], dtype=np.float32)
+conv_b = helper.make_tensor(
+    name="conv_b", data_type=onnx.TensorProto.FLOAT, dims=[10],
+    vals=conv_b_data.flatten().tolist())
 
 
 def build():
     nodes, inits = [], []
-
-    # ── 1) Identity 1x1 Conv: copy input to base ──
-    w_id = np.zeros((_CHANNELS, _CHANNELS, 1, 1), dtype=np.float32)
-    for c in range(_CHANNELS):
-        w_id[c, c, 0, 0] = 1.0
-    w_id_init = onnx.helper.make_tensor(
-        "W_id", _DATA_TYPE, [_CHANNELS, _CHANNELS, 1, 1],
-        w_id.flatten().tolist()
-    )
-    inits.append(w_id_init)
-    base_conv = onnx.helper.make_node(
-        "Conv", ["input", "W_id"], ["base"],
-        kernel_shape=[1, 1], pads=[0, 0, 0, 0]
-    )
-    nodes.append(base_conv)
-
-    # ── 2) Slice ch1 at row 2 → blue_mask (1,1,1,30) ──
-    # Opset 10 Slice: inputs=[data, starts, ends, axes, steps]
-    sl_st = onnx.helper.make_tensor(
-        "sl_st", onnx.TensorProto.INT64, [2], [1, 2]
-    )
-    sl_en = onnx.helper.make_tensor(
-        "sl_en", onnx.TensorProto.INT64, [2], [2, 3]
-    )
-    sl_ax = onnx.helper.make_tensor(
-        "sl_ax", onnx.TensorProto.INT64, [2], [1, 2]
-    )
-    inits.extend([sl_st, sl_en, sl_ax])
-    blue_slice = onnx.helper.make_node(
-        "Slice", ["input", "sl_st", "sl_en", "sl_ax"], ["blue_mask"]
-    )
-    nodes.append(blue_slice)
-
-    # ── 3) Conv(1,1,1, weight=1.0) to position blue_mask ──
-    w_pl = np.ones((1, 1, 1, 1), dtype=np.float32)
-    w_pl_init = onnx.helper.make_tensor(
-        "W_pl", _DATA_TYPE, [1, 1, 1, 1],
-        w_pl.flatten().tolist()
-    )
-    inits.append(w_pl_init)
-
-    # Position at row 2: pads=[top,left,bottom,right]
-    row2_blue = onnx.helper.make_node(
-        "Conv", ["blue_mask", "W_pl"], ["row2_blue"],
-        kernel_shape=[1, 1], pads=[2, 0, 27, 0]
-    )
-    nodes.append(row2_blue)
-
-    # Position at row 4
-    row4_blue = onnx.helper.make_node(
-        "Conv", ["blue_mask", "W_pl"], ["row4_blue"],
-        kernel_shape=[1, 1], pads=[4, 0, 25, 0]
-    )
-    nodes.append(row4_blue)
-
-    # ── 4) Channel selectors ──
-    ch1_np = np.zeros((1, _CHANNELS, 1, 1), dtype=np.float32)
-    ch1_np[0, 1, 0, 0] = 1.0
-    ch1_init = onnx.helper.make_tensor(
-        "ch1_w", _DATA_TYPE, [1, _CHANNELS, 1, 1],
-        ch1_np.flatten().tolist()
-    )
-    ch1_sel = onnx.helper.make_node("Constant", [], ["ch1_sel"], value=ch1_init)
-    nodes.append(ch1_sel)
-
-    ch5_np = np.zeros((1, _CHANNELS, 1, 1), dtype=np.float32)
-    ch5_np[0, 5, 0, 0] = 1.0
-    ch5_init = onnx.helper.make_tensor(
-        "ch5_w", _DATA_TYPE, [1, _CHANNELS, 1, 1],
-        ch5_np.flatten().tolist()
-    )
-    ch5_sel = onnx.helper.make_node("Constant", [], ["ch5_sel"], value=ch5_init)
-    nodes.append(ch5_sel)
-
-    # ── 5) Project masks to channels ──
-    # row2_blue_ch1 = blue_mask in ch1 at row 2  (to remove)
-    # row2_blue_ch5 = blue_mask in ch5 at row 2  (to add)
-    # row4_blue_ch5 = blue_mask in ch5 at row 4  (to remove)
-    # row4_blue_ch1 = blue_mask in ch1 at row 4  (to add)
-    r2b_c1 = onnx.helper.make_node("Mul", ["row2_blue", "ch1_sel"], ["r2b_c1"])
-    nodes.append(r2b_c1)
-    r2b_c5 = onnx.helper.make_node("Mul", ["row2_blue", "ch5_sel"], ["r2b_c5"])
-    nodes.append(r2b_c5)
-    r4b_c5 = onnx.helper.make_node("Mul", ["row4_blue", "ch5_sel"], ["r4b_c5"])
-    nodes.append(r4b_c5)
-    r4b_c1 = onnx.helper.make_node("Mul", ["row4_blue", "ch1_sel"], ["r4b_c1"])
-    nodes.append(r4b_c1)
-
-    # ── 6) Swap ch1 ↔ ch5 between rows 2 and 4 ──
-    t1 = onnx.helper.make_node("Sub", ["base", "r2b_c1"], ["t1"])
-    nodes.append(t1)
-    t2 = onnx.helper.make_node("Add", ["t1", "r2b_c5"], ["t2"])
-    nodes.append(t2)
-    t3 = onnx.helper.make_node("Sub", ["t2", "r4b_c5"], ["t3"])
-    nodes.append(t3)
-    out = onnx.helper.make_node("Add", ["t3", "r4b_c1"], ["output"])
-    nodes.append(out)
-
-    # ── Build model ──
-    x = onnx.helper.make_tensor_value_info("input", _DATA_TYPE, _GRID_SHAPE)
-    y = onnx.helper.make_tensor_value_info("output", _DATA_TYPE, _GRID_SHAPE)
-    graph_def = onnx.helper.make_graph(nodes, "graph", [x], [y], inits)
-    return onnx.helper.make_model(
-        graph_def, ir_version=_IR_VERSION, opset_imports=_OPSET_IMPORTS
-    )
-
+    inits.append(conv_w)
+    inits.append(conv_b)
+    nodes.append(helper.make_node("Conv", ["input", "conv_w", "conv_b"], ["output"],
+        kernel_shape=[3, 3], pads=[1, 1, 1, 1]))
+    x = helper.make_tensor_value_info("input", _DT, _GS)
+    y = helper.make_tensor_value_info("output", _DT, _GS)
+    g = helper.make_graph(nodes, "g", [x], [y], inits)
+    return helper.make_model(g, ir_version=10,
+                             opset_imports=[helper.make_opsetid("", 10)])
 
 if __name__ == '__main__':
     task_num = 73

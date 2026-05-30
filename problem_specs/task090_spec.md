@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需列级统计和空隙检测）
-- locality: global（检测空隙需整列分析）
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `yes`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 246 nodes: Cast+Conv+ConvTranspose+Gather+Max+Mul+Pad+ReduceMax+Relu+Sl. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Conv+ConvTranspose+Gather+Max+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum (246 nodes, 41 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 090
-primitive_types: [gap_detection, vertical_hole_fill, column_statistics]
-input_shape_rule: same as output
-output_shape_rule: same as input
-formal_rule_short: find the widest all-zero column range across multiple rows and fill it with color 6
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: gap selection rule for multiple candidates
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 246 nodes: Cast+Conv+ConvTranspose+Gather+Max+Mul+Pad+ReduceMax+Relu+Sl. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Conv+ConvTranspose+Gather+Max+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum
+actual_nodes: 246
 ```

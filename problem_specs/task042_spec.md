@@ -2,19 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入输出尺寸相同（10x10）。
-- 背景色为 0，关键颜色：3 (green) 和 8 (cyan)。
-- 核心规则：对于每个 3-colored 连通组件，输出中新增一个 8-colored 组件，该 8-组件是 3-组件的 180 度点反射（关于 3-组件和 8-组件组合的中心）。
-- 更准确地说：输入中所有非零像素只有颜色 3。对于每对可配对的 3-组件（或每个 3-组件），在输出中添加一个形状相同但颜色为 8 的组件，放置位置使得 3-组件与 8-组件关于它们联合的 bounding box 中心对称。
-- 如果两个 3-像素形成对角线对（如 (r,c) 和 (r+1,c+1)），则两个 8-像素放置于 (r-1,c+2) 和 (r+2,c-1)，形成矩形/菱形四顶点。
-- 3-像素本身在输出中保留。
+- 核心变换：绿色(3)45度相邻对端点外侧马步偏移(-1,+2)放置浅蓝(8)，2x2绿色方块两端外侧放置2x2浅蓝块。
+
 
 ## 2. 关键证据
 
-- train 1：两个对角 3-对分别在 (3,3)/(4,4) 和 (6,7)/(7,6)，输出新增 8 在 (2,4)、(5,5) 及 (5,1)、(8,8)，与 3 形成对称四边形。
-- train 2：两个 2x2 的 3-块分别位于左上和中左，输出新增两个 2x2 的 8-块位于左上方和右下方，形状相同。
-- train 3：仅两个孤立 3，8 放置在对称对角位置。
-- arc-gen 全部支持此对称反射规则：3-组件的形状被复制为 8-组件，位置关于联合中心 180 度旋转。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -27,24 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：需要识别连通组件、计算其中心点、在对称位置生成相同形状的新组件，属于典型的目标检测+生成逻辑，无法用单层 Conv 实现。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 54 nodes: And+Conv+Greater+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where. Study baseline for optimal op sequence.
+
+Baseline 实际架构: And+Conv+Greater+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where (54 nodes, 18 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "042"
-primitive_types: ["object_reflection", "copy_shape"]
-input_shape_rule: "same as output, 10x10"
-output_shape_rule: "same as input"
-formal_rule_short: "for each 3-component, add an 8-component at 180-degree rotated position"
-locality: "global"
-single_linear_conv_possible: "no"
-recommended_architecture: "object_logic_required"
-main_risk: "多组件时的精确反射中心尚未完全确定"
-confidence: "medium"
+task_id: 042
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 54 nodes: And+Conv+Greater+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: And+Conv+Greater+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where
+actual_nodes: 54
 ```

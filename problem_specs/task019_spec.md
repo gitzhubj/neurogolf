@@ -27,24 +27,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: unknown
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 涉及尺寸变化和填充逻辑, 无法由单卷积实现。需 ONNX 的上采样/重复 + 条件填充操作。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 35 nodes: Cast+Concat+Conv+Equal+Greater+MatMul+Mul+ReduceMax+ReduceSu. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Equal+Greater+MatMul+Mul+ReduceMax+ReduceSum+Reshape+Slice+Sub+Sum (35 nodes, 12 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 019
-primitive_types: [upscaling, tiling, gap_filling]
-input_shape_rule: variable (HxW)
-output_shape_rule: 2H x 2W
-formal_rule_short: 2x upscale, tile input, fill gaps with 8 in pattern
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: unknown
-main_risk: 8 填充模式尚未完全确定
-confidence: low
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 35 nodes: Cast+Concat+Conv+Equal+Greater+MatMul+Mul+ReduceMax+ReduceSu. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Concat+Conv+Equal+Greater+MatMul+Mul+ReduceMax+ReduceSum+Reshape+Slice+Sub+Sum
+actual_nodes: 35
 ```

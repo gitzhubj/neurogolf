@@ -26,24 +26,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：需要解析 3 行的 5 标记拓扑、识别彩色连通块、根据标记位置重新分配和调整尺寸，属于高级目标操作。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 70 nodes: Abs+Concat+Conv+Gather+Less+MatMul+MaxPool+Mul+Pad+ReduceMax. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Abs+Concat+Conv+Gather+Less+MatMul+MaxPool+Mul+Pad+ReduceMax+ReduceMin+ReduceSum+Slice+Sub+Sum+Transpose+Where (70 nodes, 26 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "046"
-primitive_types: ["object_redistribution", "size_adjustment", "separator_parsing"]
-input_shape_rule: "3 rows, variable width"
-output_shape_rule: "3 rows, often narrower width"
-formal_rule_short: "5-markers control redistribution and resizing of color blocks across 3 rows"
-locality: "global"
-single_linear_conv_possible: "no"
-recommended_architecture: "object_logic_required"
-main_risk: "分配和尺寸调整的精确公式未确定"
-confidence: "low"
+task_id: 046
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 70 nodes: Abs+Concat+Conv+Gather+Less+MatMul+MaxPool+Mul+Pad+ReduceMax. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Abs+Concat+Conv+Gather+Less+MatMul+MaxPool+Mul+Pad+ReduceMax+ReduceMin+ReduceSum+Slice+Sub+Sum+Transpose+Where
+actual_nodes: 70
 ```

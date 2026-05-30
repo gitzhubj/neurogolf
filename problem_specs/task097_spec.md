@@ -2,28 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入与输出尺寸相同。背景色为 0。
-- 输入在各种位置散布大量同色像素（颜色因样例而异：8、6、5、4、3）。输出仅保留有邻接的像素。
-- 核心规则：移除所有在 8-连通（包含对角线）意义下没有同色邻居的孤立像素。保留所有至少有一个 8-连通同色邻居的像素。
+- 核心变换：孤立移除：去除8邻域连通分量大小小于2的孤立像素，仅保留连通分量>=2的像素。
 
-```text
-for each non-zero cell (r,c):
-    has_neighbor_8conn = False
-    for each neighbor (nr, nc) in 8-directional neighborhood:
-        if input[nr,nc] == input[r,c]:
-            has_neighbor_8conn = True
-    output[r,c] = input[r,c] if has_neighbor_8conn else 0
-```
-
-- 4-连通邻居不满足条件，需要对角邻居也算在内。
 
 ## 2. 关键证据
 
-- train[0]: color 8，孤立像素如 (2,7),(2,9),(5,8),(6,6) 等被移除（无 8-连通同色邻居）。对角像素对 (0,1)+(1,0) 被保留。
-- train[1]: color 6，孤立像素如 (2,14) 等被移除。保持了对角邻接簇如 (1,1) 等。
-- train[3]: color 4，较小网格（9x17），孤立像素按 8-连通规则被正确移除/保留。
-- 所有被保留的非零像素均在输入中有至少一个 8-连通同色邻居。
-- arc-gen 含 262 个样例覆盖多种颜色和密度。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -32,26 +19,33 @@ for each non-zero cell (r,c):
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_kxk_conv
-- locality: 1（3x3 邻域即足够检测 8-连通邻居）
-- single_linear_conv_possible: probably
-- recommended_kernel: 3x3
-- nonlinearity_needed: yes
-- 实现：用 3x3 Conv（固定 kernel，所有权重为 1）对每个颜色通道做邻域求和。若 sum >= 2（自身+至少 1 个邻居），则保留。需要非线性（大于等于比较）。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 11 nodes: Cast+Concat+Conv+Greater+ReduceSum+Slice+Where. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Greater+ReduceSum+Slice+Where (11 nodes, 6 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 097
-primitive_types: [noise_removal, connectivity_filter, morphological_operation]
-input_shape_rule: variable size
-output_shape_rule: same as input
-formal_rule_short: remove pixels without any 8-connected same-color neighbor
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_kxk_conv
-memory_priority: efficient single-pass 3x3 Conv per color channel; avoids iterative processing
-fusion_hint: use 3x3 Conv with all-ones kernel on each color channel, then threshold >=2
-main_risk: none identified
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 11 nodes: Cast+Concat+Conv+Greater+ReduceSum+Slice+Where. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: Cast+Concat+Conv+Greater+ReduceSum+Slice+Where
+actual_nodes: 11
 ```

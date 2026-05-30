@@ -1,19 +1,27 @@
-"""Task 062 — Symmetry completion: fill background with color 3, mirror
-sparse shape to form symmetric closed pattern, merge secondary into primary.
+"""Task 062 — 核心变换：背景黑(0)变绿(3)，红(2)融入相邻有色形状并扩展填充凹陷处。
 
-Stub: Infeasible with simple Conv. Requires: (1) identify primary and
-secondary colors (frequency analysis), (2) detect shape boundaries and
-symmetry axes, (3) mirror the shape across the axis, (4) fill background.
-All steps require object-level reasoning and non-local operations.
-The symmetry axis and mirror pattern vary per example, making fixed
-Conv weights insufficient.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task062.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 62

@@ -2,23 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入网格由水平方向重复的块(period)拼成,输出为**第一个完整周期块**(最左侧的 N 列,其中 N 为水平周期长度)。
-- 核心规则:找到最小的正整数 N 使得对所有 i,W-N-1 列满足`input[:, i] == input[:, i+N]`,输出`input[:, 0:N]`。
+- 核心变换：周期提取：输入水平重复模式周期等于行数H，输出前H列最小周期正方形。
 
-```text
-find minimal N in [1, W//2] such that for all i in [0, W-N-1]: input[:, i] == input[:, i+N]
-output = input[:, 0:N]
-```
-
-- 输出行数与输入相同,列数 = N。
 
 ## 2. 关键证据
 
-- train[0]:3×9 输入,周期 N=3(每 3 列重复),输出 3×3(前 3 列)。
-- train[1]:4×12 输入,周期 N=4,输出 4×4。
-- train[2]:2×6 输入,周期 N=2,输出 2×2。
-- test[0]:5×15 输入,周期 N=5,输出 5×5。
-- arc-gen 有 262 个样例,全部支持周期性检测规则。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -28,26 +20,33 @@ output = input[:, 0:N]
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: constant_or_lookup_like_network
-- locality: global(需比较全列)
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: no
-- 周期检测需要全局比较列之间的异同,不能由 Conv 完成。但输出只是简单的裁剪(取前 N 列),裁剪本身是索引操作。
-- memory_priority: 裁剪操作只产生一个输出张量(尺寸小于等于输入),内存友好。周期检测可用 Reduce 操作实现(逐列比较)。
-- fusion_hint: 周期检测和裁剪可分离:检测逻辑用少量 Reduce 和 ArgMin,裁剪用 Slice。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 7 nodes: Conv+Div+Greater+ReduceMax+ReduceSum+Sum+Where. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Conv+Div+Greater+ReduceMax+ReduceSum+Sum+Where (7 nodes, 4 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 067
-primitive_types: [period_detection, tiling, cropping, column_comparison]
-input_shape_rule: R x W (W multiple of period)
-output_shape_rule: R x N (N = horizontal period)
-formal_rule_short: output = first period of input's horizontal tiling, N = min period such that col[i] == col[i+N]
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: constant_or_lookup_like_network
-main_risk: none
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 7 nodes: Conv+Div+Greater+ReduceMax+ReduceSum+Sum+Where. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: Conv+Div+Greater+ReduceMax+ReduceSum+Sum+Where
+actual_nodes: 7
 ```

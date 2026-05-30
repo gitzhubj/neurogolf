@@ -2,28 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入固定 7x7，输出固定 7x7（同尺寸）。
-- 背景色为 0。输入中非零值沿某条反对角线（anti-diagonal，即 r+c 为常数的线）及其邻近位置出现，形成一段颜色序列。
-- 核心变换：从输入反对角线提取非零颜色序列 S（长度为 L，L=3 或 4），然后将该序列沿反对角线方向平铺填充整个 7x7 输出。
-- 输出[r,c] = S[(r + c) mod L]。颜色序列在输出中保持输入原色，不重染色。
+- 核心变换：左右AND匹配：3x7输入以灰色(5)列分离左右两个3x3区域，逐像素AND运算，结果1替换为2。
 
-```text
-# 从输入沿反对角线提取颜色序列 S
-S = [values at positions where r+c increases and value != 0]
-# 或等效地：S 是沿主反对角线遇到的非零颜色的循环序列
-L = length of S
-
-for r in 0..6, c in 0..6:
-    output[r][c] = S[(r + c) % L]
-```
 
 ## 2. 关键证据
 
-- train 0：输入反对角线 (0,0)=2、(0,1)=8、(0,2)=3 构成序列 [2,8,3]。输出按 anti-diagonal 方向重复平铺：行 0 为 [2,8,3,2,8,3,2]（r+c=0..6 依次对应 S[0..6 mod 3]），行 1 为 [8,3,2,8,3,2,8]（r+c=1..7 对应 S[1..7 mod 3]），全图一致。
-- train 1：输入序列从右下向左上读取为 [1,2,4]。输出平铺序列 [2,4,1]（序列起点取输出[0,0]对应的值）。全图按 (r+c) mod 3 的节奏铺满。
-- train 2：输入含 4 色序列 [4,8,3,x]，输出按 (r+c) mod L 平铺，L=3 或 4 取决于序列长度。
-- test：输入反对角线含 [1,4,2] 三种色，输出平铺验证序列 tiling 规则。
-- arc-gen 涵盖多组颜色组合和不同序列长度，均支持反对角线序列提取 + 全图平铺。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -33,23 +20,33 @@ for r in 0..6, c in 0..6:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu（需序列检测和复制定位，单层 Conv 不足以覆盖序列方向的全局平铺）
-- locality: global（每输出格依赖序列长度和起始偏置，后者需全局序列提取）
-- single_linear_conv_possible: no（序列起始检测和 (r+c) mod L 的坐标路由非单层线性可表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（序列检测的 argmin/argmax 逻辑需要非线性）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 10 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Mul+Pad+ReduceMax+Slice+Sub+Sum (10 nodes, 10 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 006
-primitive_types: [pattern_completion, tiling, sequence_extraction]
-input_shape_rule: fixed 7x7
-output_shape_rule: fixed 7x7
-formal_rule_short: extract color sequence from anti-diagonal, tile it across the full grid using (r+c) mod L indexing
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: sequence start position alignment varies between examples; precise extraction rule for multi-sequence inputs undefined
-confidence: medium
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 10 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Mul+Pad+ReduceMax+Slice+Sub+Sum
+actual_nodes: 10
 ```

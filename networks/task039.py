@@ -1,34 +1,30 @@
-"""Task 039 — ANALYSIS STUB.
+"""Task 039 — 核心变换：对称提取：找到对称图案最小外接矩形，输出左上角3x3子网格。
 
-From spec: Extract center 3x3 of nested symmetric pattern. 10x10 input
-has concentric color layers. Output is the 3x3 center region of the pattern.
-
-Example: Multi-layer pattern → output 3x3 at pattern center.
-
-NOT CONV-AMENABLE: Requires finding the pattern center coordinates,
-which vary per example. Conv operates equally on all positions and
-cannot selectively crop to a dynamic center region.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 039: center crop requires pattern symmetry analysis "
-        "to find the center — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task039.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 39
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

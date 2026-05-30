@@ -1,34 +1,30 @@
-"""Task 044 — ANALYSIS STUB.
+"""Task 044 — 核心变换：找出灰色(5)形状包围的黑色空洞，将外部彩色图案按相同形状移入空洞填补。
 
-From spec: Object swap between 5-frame containers. 10x10 grid.
-5-colored frames act as containers for content blocks of other colors.
-Content blocks with matching bounding box shapes are swapped between
-their frames. Frames (color 5) remain unchanged.
-
-NOT CONV-AMENABLE: Requires object detection, frame identification,
-bounding box computation, shape matching, and cross-frame swapping.
-All are multi-step object-level operations.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 044: object swap requires frame/object analysis and "
-        "cross-frame content transfer — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task044.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 44
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

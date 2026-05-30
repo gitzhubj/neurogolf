@@ -34,23 +34,33 @@ for each same-color 8-connected object C with color k:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需同色 8-连通分量分割、对象级 bbox、条件坐标映射）
-- locality: global（每个像素是否移动取决于所属对象的全局 bottom(C) 和 right(C)）
-- single_linear_conv_possible: no（需连通组件和对象级条件路由）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（对象分割和条件 gate 均需非线性）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 39 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Cast+Concat+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where (39 nodes, 10 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 003
-primitive_types: [object_movement, connected_component_reasoning, conditional_gate]
-input_shape_rule: variable rectangular (8..16 x 8..16)
-output_shape_rule: same as input
-formal_rule_short: for each same-color 8-connected object, keep bottom row, shift other rows right by 1 capped at object rightmost column
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: collision resolution between objects undefined; connectivity type (4 vs 8) decisive for diagonal shapes
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 39 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Cast+Concat+Less+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where
+actual_nodes: 39
 ```

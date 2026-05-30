@@ -31,29 +31,33 @@ for each cell (r,c):
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv
-- locality: 0
-- single_linear_conv_possible: yes
-- recommended_kernel: 1x1
-- nonlinearity_needed: no
-- 这是典型的逐像素颜色重映射。1x1 Conv(in=10, out=10)即可实现：
-  - 红(2)→2, 黄(4)→4, 所有其他非零色→4, 0→0
-  - 具体: W[4, X] = 1.0(将所有非红非背景色映射到 4), W[2,2] = 1.0, W[0,0] = 1.0
-- 由于颜色 X 因样例而异，需要确定哪个颜色应被替换。但这在 1x1 Conv 中只需调整对应输入 channel 到输出 channel 4 的权重。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (72 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: And+Cast+Gather+Greater+Less+MaxPool+Mul+Not+Or+Pad+QLinearMatMul+Reshape+Sub+Su...
+
+Baseline 实际架构: And+Cast+Gather+Greater+Less+MaxPool+Mul+Not+Or+Pad+QLinearMatMul+Reshape+Sub+Sum+Transpose+Where (72 nodes, 20 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 077
-primitive_types: [color_replacement, selective_recoloring, red_preservation]
-input_shape_rule: variable (14x14 to 17x18)
-output_shape_rule: same as input
-formal_rule_short: All non-red, non-background pixels become yellow(4); red(2) and background(0) unchanged
-locality: 0
-single_linear_conv_possible: yes
-recommended_architecture: single_1x1_conv
-memory_priority: Minimal - single 1x1 Conv, no intermediate tensors
-fusion_hint: Single 1x1 Conv maps all non-red non-zero channels to output channel 4
-main_risk: none
-confidence: high
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
+single_linear_conv_possible: no
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (72 nodes). Study baseline directly.
+fusion_hint: Ops used: And+Cast+Gather+Greater+Less+MaxPool+Mul+Not+Or+Pad+QLinearMatMul+Reshape+Sub+Su...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: And+Cast+Gather+Greater+Less+MaxPool+Mul+Not+Or+Pad+QLinearMatMul+Reshape+Sub+Sum+Transpose+Where
+actual_nodes: 72
 ```

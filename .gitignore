@@ -28,7 +28,9 @@ input/*.json
 .locks/
 
 # ONNX output artifacts
-onnx_export/*.onnx
 !onnx_export/.gitkeep
+# (onnx_export/*.onnx now tracked — needed by CI to submit to Kaggle)
+# ONNX profiler traces (auto-generated during verify_network)
+profiler_traces/
 profiling*.json
 *_202?-*-*.json

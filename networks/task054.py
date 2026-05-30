@@ -1,15 +1,27 @@
-"""Task 054 — Crosshair drawing from special-colored cells to boundary color.
+"""Task 054 — 核心变换：区域内的"特殊格"（颜色与区域主色不同）沿水平和垂直方向投影，画出十字线。
 
-Stub: Infeasible with simple Conv. Requires: (1) region/boundary detection,
-(2) ray casting in 4 directions, (3) color priority at intersections.
-All need global object-level processing beyond Conv opset 10 capability.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task054.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 54

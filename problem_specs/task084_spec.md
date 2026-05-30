@@ -23,23 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: constant_or_lookup_like_network（固定坐标模板 + 左列保留）
-- locality: 0
-- single_linear_conv_possible: yes（1×1 Conv 可按 (r,c) 坐标查表输出颜色）
-- recommended_kernel: 1x1
-- nonlinearity_needed: no
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 257 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Abs+Add+Cast+Less+Mul+ReduceSum+Sub+Sum (257 nodes, 142 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 084
-primitive_types: [fixed_geometric_template, anti_diagonal, bottom_fill]
-input_shape_rule: HxW (varies)
-output_shape_rule: same as input
-formal_rule_short: keep left column color, draw anti-diagonal in 2, fill bottom row with 4
-locality: 0
-single_linear_conv_possible: yes
-recommended_architecture: single_1x1_conv
-main_risk: none
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: global
+single_linear_conv_possible: no
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 257 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Abs+Add+Cast+Less+Mul+ReduceSum+Sub+Sum
+actual_nodes: 257
 ```

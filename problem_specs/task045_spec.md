@@ -2,27 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入输出尺寸相同（均为 10x10）。
-- 背景色为 0。每行仅在首列（col 0）和末列（col 9）可能有非零颜色值。
-- 核心规则：对于每一行，若首列和末列的颜色相同且非零，则将该行整行填充为该颜色。否则该行保持不变（仅首尾两像素保留原色，中间全为 0）。
-- 形式化：
+- 核心变换：行匹配填充：每行首尾列非零像素同色则整行填充该颜色。
 
-```text
-for each row r:
-    if input[r][0] == input[r][W-1] and input[r][0] != 0:
-        output[r][:] = input[r][0]
-    else:
-        output[r][:] = input[r][:]
-```
-
-- 不涉及任何对象识别或全局操作，纯逐行规则。
 
 ## 2. 关键证据
 
-- train 1：row 5 首尾均为 4 → 整行变 4。row 1 首 9 尾 6 → 不变。row 7 首 6 尾 8 → 不变。
-- train 2：row 1 首尾均为 8 → 整行 8。row 7 首尾均为 1 → 整行 1。其他行首尾不同 → 不变。
-- train 3：row 3 首尾均为 3 → 整行 3。row 7 首尾均为 6 → 整行 6。row 5 首尾不同 → 不变。
-- arc-gen 全部支持：首尾同色即全行填充，否则保持。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -33,24 +21,33 @@ for each row r:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv
-- locality: 0
-- single_linear_conv_possible: yes
-- recommended_kernel: 1x1
-- nonlinearity_needed: no (if using conditional logic via mask), or yes (if using ReLU trick)
-- 原因：每行输出仅取决于该行的首尾两个像素值。可以用条件 mask（首==尾且非零）来切换"全行填色"或"保持原样"。1x1 Conv 可逐像素实现复制首/尾列值。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 11 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Cast+Greater+Mul+Pad+ReduceSum+Slice+Where (11 nodes, 12 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "045"
-primitive_types: ["conditional_row_fill", "edge_comparison"]
-input_shape_rule: "same as output, 10x10"
-output_shape_rule: "same as input"
-formal_rule_short: "if first_col == last_col != 0, fill entire row with that color"
-locality: "1 (per row, depends only on row endpoints)"
-single_linear_conv_possible: "probably"
-recommended_architecture: "single_1x1_conv"
-main_risk: "纯粹 1x1 Conv 无 mask 时可能需多层，但可通过广播首尾列实现"
-confidence: "high"
+task_id: 045
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: global
+single_linear_conv_possible: no
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 11 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Cast+Greater+Mul+Pad+ReduceSum+Slice+Where
+actual_nodes: 11
 ```

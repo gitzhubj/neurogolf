@@ -491,7 +491,8 @@ def single_layer_conv2d_network(weight_fn, kernel_size):
 
 
 def verify_network(network, task_num, examples):
-  filename = "task{:03d}.onnx".format(task_num)
+  filename = "onnx_export/task{:03d}.onnx".format(task_num)
+  pathlib.Path("onnx_export").mkdir(exist_ok=True)
   onnx.save(network, filename)
   if not check_network(filename): return
   try:
@@ -563,4 +564,89 @@ def verify_subset(session, example_subset):
       wrong += 1
   if error: print(f"Error: {error}")
   return right, wrong, expected
+
+
+def show_one(example):
+  """Print a single example's input and output grids as ASCII text."""
+  inp = example["input"]
+  out = example["output"]
+  print(f"Input ({len(inp)}x{len(inp[0])}):")
+  for row in inp:
+    print("  " + "".join(str(c) for c in row))
+  print(f"Output ({len(out)}x{len(out[0])}):")
+  for row in out:
+    print("  " + "".join(str(c) for c in row))
+
+
+def debug_compare(network, task_num, example_idx=0):
+  """Run network on a single example and print expected vs actual as ASCII grids.
+
+  Highlights mismatched pixels with square brackets.
+  """
+  import onnx, onnxruntime
+
+  examples = load_examples(task_num)
+  all_examples = examples["train"] + examples["test"] + examples.get("arc-gen", [])
+  if example_idx >= len(all_examples):
+    print(f"Example index {example_idx} out of range (max {len(all_examples)-1})")
+    return
+  example = all_examples[example_idx]
+  benchmark = convert_to_numpy(example)
+  if not benchmark:
+    print("Grid too large (>30x30), skipping")
+    return
+
+  filename = f"onnx_export/_debug_{task_num:03d}.onnx"
+  onnx.save(network, filename)
+  sanitized = sanitize_model(onnx.load(filename))
+  if not sanitized:
+    print("Sanitization failed")
+    return
+  options = onnxruntime.SessionOptions()
+  options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+  session = onnxruntime.InferenceSession(sanitized.SerializeToString(), options)
+
+  try:
+    result = run_network(session, benchmark["input"])
+  except onnxruntime.ONNXRuntimeError as e:
+    print(f"Inference error: {e}")
+    return
+
+  expected_grid = convert_from_numpy(benchmark["output"])
+  actual_grid = convert_from_numpy(result)
+
+  h = max(len(expected_grid), len(actual_grid))
+  print(f"\n{'='*60}")
+  print(f"Task {task_num}, Example {example_idx}")
+  print(f"Expected ({len(expected_grid)}x{len(expected_grid[0]) if expected_grid else 0})  |  "
+        f"Actual ({len(actual_grid)}x{len(actual_grid[0]) if actual_grid else 0})")
+  print(f"{'='*60}")
+
+  match_count = 0
+  mismatch_count = 0
+  for r in range(h):
+    exp_row = expected_grid[r] if r < len(expected_grid) else []
+    act_row = actual_grid[r] if r < len(actual_grid) else []
+    exp_str = ""
+    act_str = ""
+    max_c = max(len(exp_row), len(act_row))
+    for c in range(max_c):
+      ev = exp_row[c] if c < len(exp_row) else None
+      av = act_row[c] if c < len(act_row) else None
+      if ev == av:
+        exp_str += str(ev) if ev is not None else "."
+        act_str += str(av) if av is not None else "."
+        match_count += 1
+      else:
+        exp_str += f"[{ev}]" if ev is not None else "[.]"
+        act_str += f"[{av}]" if av is not None else "[.]"
+        mismatch_count += 1
+    print(f"  {exp_str:<40} {act_str}")
+
+  print(f"{'='*60}")
+  print(f"Matches: {match_count}, Mismatches: {mismatch_count}")
+  if mismatch_count == 0:
+    print("ALL MATCH - OK")
+  else:
+    print("MISMATCH DETECTED - FAIL")
 

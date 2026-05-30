@@ -1,21 +1,27 @@
-"""Task 061 — Modular multiplication table: output[r,c] = (r*c+1) mod M
-(with 0→M), where M = max non-zero color in input. Fill 0 cells only.
+"""Task 061 — 核心变换：周期补全：识别输入中周期性重复图案，用对应周期值填充零区域。
 
-Stub: Infeasible with simple Conv. Requires: (1) global ReduceMax to find
-M, (2) multiplication and modulo operations per cell, (3) conditional
-fill (only where input is 0). Steps (1) and (2) require global statistics
-and arithmetic beyond Conv capabilities. While step (1) can use ReduceMax,
-step (2) needs per-pixel (r,c) computation dependent on M, which varies
-per example (M=5,6,7,8,9 in train+test). 9 possible M's would need 9x
-pre-computed patterns with selection logic, violating the single-fixed-weight
-constraint across examples.
+架构: reduce_only (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_only)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task061.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 61

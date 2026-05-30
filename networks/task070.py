@@ -1,19 +1,27 @@
-"""Task 070 — Fill 0-cells adjacent to color-8 walls inside enclosed
-regions with color 3.
+"""Task 070 — 核心规则:颜色 8 形成容器壁,颜色 1 形成纹理背景。8 所包围内部区域中的**部分 0 单元格变为 3**(绿色)。
 
-Stub: Infeasible with simple Conv. Requires: (1) detect color-8 wall
-enclosures, (2) identify interior 0-cells adjacent to walls,
-(3) conditional fill. Enclosure detection needs flood-fill from grid
-edges to distinguish interior from exterior. Adjacency check needs
-local neighborhood inspection. The combination of global connectivity
-analysis + conditional local fill exceeds Conv capabilities.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task070.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 70

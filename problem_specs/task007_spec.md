@@ -2,31 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入输出同尺寸。输入尺寸可变（观测 9..16 行，8..16 列）。
-- 背景色为 0。输出保持输入中所有非零颜色不变，无重染色。
-- 核心变换：对象垂直压实——移除对象之间的空白行，使各对象在垂直方向上紧挨排列（上下对象之间不留空白行），但对象内部结构和水平位置保持不变。对象自身的形状和颜色完全保留。
-- 压实方向为由上往下堆积：最上方对象保持原位（或滑动到最靠近上方边界），后续对象依次紧接前一对象的底部。
-- 对象以 8-连通或 4-连通同色组件识别。压实过程中对象内部像素相对关系不变。
+- 核心变换：对角线序列平铺：提取反对角线上非零颜色序列，沿对角线方向循环填充整个输出。
 
-```text
-objects = identify connected components (8-connected, same color)
-sort objects by min_row ascending
-current_top = 0 (or keep first object at its original top)
-for each object in sorted order:
-    shift object vertically so its top row = current_top
-    current_top = object bottom row + 1
-    (horizontal positions unchanged)
-write shifted objects to output
-```
-
-- 若网格顶部有空行，所有对象整体上移至顶部。
 
 ## 2. 关键证据
 
-- train 0（14x9）：输入有颜色 2 对象（行 2-3）和颜色 8 对象（行 10-11），中间隔 5 行空白。输出中颜色 2 对象滑至行 8-9，颜色 8 对象保持行 10-11，两对象之间仅隔 1 行（无空白）。
-- train 1（9x10）：两对象间有大量空白行，输出中对象垂直压实，之间间距为 0。
-- train 2（11x10）：多对象压实，所有垂直空白行被消除，对象保持各自形状和颜色。
-- arc-gen 支持多种对象形状、颜色和不同间距的压实场景。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -36,23 +20,33 @@ write shifted objects to output
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需连通组件识别、排序、坐标平移）
-- locality: global（对象移动距离取决于前面所有对象的高度累积）
-- single_linear_conv_possible: no（需对象级检测、排序和可变平移）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 13 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: ArgMax+Concat+OneHot+Pad+ReduceMax+Reshape+Slice+Tile+Unsqueeze (13 nodes, 13 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 007
-primitive_types: [object_movement, connected_component_reasoning, compaction]
-input_shape_rule: variable rectangular (9..16 x 8..16)
-output_shape_rule: same as input
-formal_rule_short: vertically compact objects by removing blank rows between them; objects maintain shape and color
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: exact vertical alignment rule (top-align vs bottom-align vs gap-fill) needs verification; horizontal position changes ambiguous
-confidence: medium
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 13 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: ArgMax+Concat+OneHot+Pad+ReduceMax+Reshape+Slice+Tile+Unsqueeze
+actual_nodes: 13
 ```

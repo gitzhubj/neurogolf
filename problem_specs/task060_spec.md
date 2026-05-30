@@ -33,24 +33,33 @@ for each row r:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv（每行独立颜色映射，依赖行内左右端点位置）
-- locality: 1（需要同行内跨列查找左右端点）
-- single_linear_conv_possible: probably（可用 1x1 Conv 处理，因为每个位置的输出仅依赖该位置的输入颜色和列索引）
-- recommended_kernel: 1x1
-- nonlinearity_needed: no
-- memory_priority: 1×1 Conv 可直接实现：对每个 (row, col)，若该行有左右颜色且 col 在相应范围内，则输出对应颜色。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `custom_multi_op`
+- `locality`: `varies`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `varies`
+- `nonlinearity_needed`: `unknown`
+- `memory_priority`: Multi-op custom architecture (16 nodes). Study baseline directly.
+- `fusion_hint`: Ops used: Mul+Pad+Slice+Sub+Sum...
+
+Baseline 实际架构: Mul+Pad+Slice+Sub+Sum (16 nodes, 18 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 060
-primitive_types: [horizontal_fill, color_pair_expansion, row_wise]
-input_shape_rule: fixed 5x11
-output_shape_rule: fixed 5x11
-formal_rule_short: for each row with left/right color endpoints, fill left half with left color, mid with 5, right half with right color
-locality: 1
-single_linear_conv_possible: probably
-recommended_architecture: single_1x1_conv
-main_risk: none
-confidence: high
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: varies
+single_linear_conv_possible: no
+recommended_architecture: custom_multi_op
+memory_priority: Multi-op custom architecture (16 nodes). Study baseline directly.
+fusion_hint: Ops used: Mul+Pad+Slice+Sub+Sum...
+main_risk: high — complex architecture, refer to baseline
+confidence: medium
+actual_ops: Mul+Pad+Slice+Sub+Sum
+actual_nodes: 16
 ```

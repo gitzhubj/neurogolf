@@ -1,35 +1,30 @@
-"""Task 042 — ANALYSIS STUB.
+"""Task 042 — 核心变换：绿色(3)45度相邻对端点外侧马步偏移(-1,+2)放置浅蓝(8)，2x2绿色方块两端外侧放置2x2浅蓝块。
 
-From spec: Object reflection. 10x10 grid. For each 3-colored connected
-component, an 8-colored component is added at the 180-degree rotated
-position about the component's center.
-
-Example: Two diagonal 3-pixels at (3,3)/(4,4) and (6,7)/(7,6).
-Output adds 8-pixels at (2,4)/(5,5) and (5,1)/(8,8).
-
-NOT CONV-AMENABLE: Requires connected component analysis, center
-computation, and shape copy at rotated position. All global operations.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 042: object reflection requires component analysis and "
-        "rotation — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task042.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 42
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

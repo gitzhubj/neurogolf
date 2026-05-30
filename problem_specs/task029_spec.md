@@ -25,24 +25,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：与 task027 相同——需要定位于像素坐标并生成条件性区域图案。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 88 nodes: Add+ArgMax+Cast+Conv+Equal+Gather+Greater+Less+Mul+ReduceMax. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Add+ArgMax+Cast+Conv+Equal+Gather+Greater+Less+Mul+ReduceMax+ReduceMin+ReduceSum+Squeeze+Sub+Unsqueeze+Where (88 nodes, 15 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 029
-primitive_types: [pixel_detection, region_split, pattern_generation]
-input_shape_rule: 10x10 (可能变化)
-output_shape_rule: same as input
-formal_rule_short: 同 task027——两像素行坐标划分三段，生成框/竖条/满行图案
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: 可能存在不同于 task027 的变体
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 88 nodes: Add+ArgMax+Cast+Conv+Equal+Gather+Greater+Less+Mul+ReduceMax. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Add+ArgMax+Cast+Conv+Equal+Gather+Greater+Less+Mul+ReduceMax+ReduceMin+ReduceSum+Squeeze+Sub+Unsqueeze+Where
+actual_nodes: 88
 ```

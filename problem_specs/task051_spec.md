@@ -31,23 +31,33 @@ for each cell along direction from diamond edge to border:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需检测形状方向 + 条件投影）
-- locality: global（投影线可横跨整个网格）
-- single_linear_conv_possible: no（方向检测和条件延伸非单层线性 Conv 可表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 57 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: And+ArgMax+Cast+Concat+Equal+Greater+Less+Mul+Or+ReduceMax+ReduceSum+Slice+Sub+Unsqueeze+Where (57 nodes, 13 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 051
-primitive_types: [shape_detection, direction_detection, line_projection]
-input_shape_rule: same as output (H_in = H_out, W_in = W_out)
-output_shape_rule: same as input
-formal_rule_short: detect arrow direction from diamond shape, extend center color as a line along that direction to border
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: direction detection algorithm ambiguous
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 57 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: And+ArgMax+Cast+Concat+Equal+Greater+Less+Mul+Or+ReduceMax+ReduceSum+Slice+Sub+Unsqueeze+Where
+actual_nodes: 57
 ```

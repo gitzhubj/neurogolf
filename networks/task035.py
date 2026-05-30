@@ -1,35 +1,30 @@
-"""Task 035 — ANALYSIS STUB.
+"""Task 035 — 核心变换：天蓝(8)矩形块中靠近外部彩色点的边缘像素替换为最近彩色点颜色。
 
-From spec: Color projection. 10x10 grid. An 8-colored rectangle sits in
-the middle. "Probe" pixels outside the rectangle project their color onto
-the rectangle's boundary along the row or column direction.
-
-Example: probe 9 above rectangle → rectangle top boundary becomes 9.
-Probe 6 to the left → left boundary becomes 6.
-
-NOT CONV-AMENABLE: Requires rectangle boundary detection, probe position
-analysis, and row/column projection logic. Multiple global operations.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 035: color projection requires rectangle detection and "
-        "probe-to-boundary mapping — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task035.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 35
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

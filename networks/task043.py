@@ -1,37 +1,30 @@
-"""Task 043 — ANALYSIS STUB.
+"""Task 043 — 核心变换：取首行灰色(5)列位置，在每行最右列有灰(5)的行上红(2)填充相同列位置。
 
-From spec: Conditional pattern copy from row 0. 10x10 grid.
-Row 0 contains a 5-pattern. If a row's last column is 5, copy row 0's
-5-pattern to that row as color 2 instead of 5. The last column stays 5.
-
-Example: Row 0 = [5,0,0,5,0,0,0,5,0,0], rows 3 and 7 have last col = 5
-→ rows 3 and 7 get [2,0,0,2,0,0,0,2,0,5].
-
-NOT CONV-AMENABLE: Requires reading row 0 from arbitrary row positions.
-The trigger check (last column of current row) and the source pattern
-(row 0) are at distant spatial positions not reachable together by a
-small Conv kernel without many layers.
+架构: custom_multi_op (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (custom_multi_op)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 043: conditional pattern copy from row 0 requires "
-        "cross-row access beyond small-kernel range."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task043.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 43
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

@@ -1,21 +1,27 @@
-"""Task 060 — Horizontal fill: for rows with left/right color endpoints at
-col 0 and col 10, fill left-half with left color, mid col 5 with gray(5),
-right-half with right color.
+"""Task 060 — 核心变换：对每一对有颜色端点的行，从左端点的颜色开始，填充该行左半部分（col 0 到 col 4）；在正中间列（col 5）填充颜色 5（灰色分隔符）；从 col 6 到 col 10 填充右端点的
 
-Stub: Infeasible with simple Conv. Each output position depends on the
-endpoint colors at cols 0 and 10 of the same row, which requires
-non-local information. A single Conv (even 1x11 covering full width)
-cannot encode position-dependent copying from specific columns because
-the same kernel weights are applied at every position. While Slice+Tile+
-Concat could broadcast endpoint colors, the approach requires conditional
-logic (detecting whether endpoints exist) that exceeds opset 10 capabilities.
+架构: custom_multi_op (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (custom_multi_op)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task060.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 60

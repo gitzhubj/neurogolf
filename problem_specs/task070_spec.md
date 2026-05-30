@@ -35,26 +35,33 @@ other cells (1, 8) unchanged
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global(需要连通性和包围检测)
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 需要 flood-fill 或膨胀操作来识别 8 周边的内部区域,属于对象级逻辑。
-- memory_priority: 可使用迭代形态学膨胀从 8 向外扩展,标记可达的内部 0,限制迭代次数以避免填满整个容器。
-- fusion_hint: 形态学膨胀可用 3×3 Conv(权重为 All-ones)+阈值化模拟,对 8 周围逐层扩张。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 71 nodes: And+Cast+Conv+Greater+Mul+Pad+ReduceMax+Slice+Sum. Study baseline for optimal op sequence.
+
+Baseline 实际架构: And+Cast+Conv+Greater+Mul+Pad+ReduceMax+Slice+Sum (71 nodes, 16 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 070
-primitive_types: [enclosure_fill, wall_adjacent, morphological_dilation, cavity_filling]
-input_shape_rule: 17x17
-output_shape_rule: 17x17
-formal_rule_short: fill 0-cells adjacent to color-8 walls (inside enclosed region) with color 3
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: exact extent of fill (all interior 0 vs only wall-neighbor 0)
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 71 nodes: And+Cast+Conv+Greater+Mul+Pad+ReduceMax+Slice+Sum. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: And+Cast+Conv+Greater+Mul+Pad+ReduceMax+Slice+Sum
+actual_nodes: 71
 ```

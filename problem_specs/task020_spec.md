@@ -27,24 +27,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: 2
-- single_linear_conv_possible: no
-- recommended_kernel: 5x5
-- nonlinearity_needed: yes
-- 需要检测十字对象并执行定向的颜色扩展/替换。至少 2 层: 检测层确定十字中心和臂, 变换层执行方向性颜色填充。5x5 邻域可覆盖十字对象的完整形状。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 245 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Add+And+ArgMax+Cast+Clip+Concat+Equal+Gather+Greater+Less+Mul+Pad+ReduceMax+ReduceSum+Reshape+Sub+Sum+Where (245 nodes, 25 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 020
-primitive_types: [object_detection, directional_modification, arm_replacement]
-input_shape_rule: 12x12 (variable)
-output_shape_rule: same as input
-formal_rule_short: 不确定; 十字对象臂的方向/颜色变换
-locality: 2
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: global
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: 核心变换规则尚未完全确定
-confidence: low
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 245 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Add+And+ArgMax+Cast+Clip+Concat+Equal+Gather+Greater+Less+Mul+Pad+ReduceMax+ReduceSum+Reshape+Sub+Sum+Where
+actual_nodes: 245
 ```

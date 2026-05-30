@@ -1,19 +1,27 @@
-"""Task 068 — Find the unique color appearing exactly once, draw a 3x3
-red(2) box centered on that pixel.
+"""Task 068 — 核心变换：唯一出现的非零颜色像素用红色(2)框围成3x3方块标记。
 
-Stub: Infeasible with simple Conv. Requires: (1) global color histogram
-to identify the color with count=1, (2) locate its coordinates,
-(3) draw a 3x3 box. Step (1) needs ReduceMin over per-channel counts
-(global), step (2) needs Where-like coordinate extraction, step (3)
-needs position-dependent value assignment. All exceed what opset 10
-Conv+element-wise can express without Scatter/NonZero/Unique.
+架构: conv_with_logic (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys; from pathlib import Path
+import sys, numpy as np
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
+
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (conv_with_logic)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    return nu.single_layer_conv2d_network(lambda o, i, kc: 1.0 if kc == (0,0) and o == i else 0.0, kernel_size=1)
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task068.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 68

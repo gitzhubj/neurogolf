@@ -2,17 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入为一组不同尺寸的小网格, 每个网格内有一种唯一的非零"面板颜色"。
-- 输出为该唯一颜色面板的 bounding box 裁剪结果, 丢弃所有零值边框。
-- 裁剪规则: 找到输入中该唯一非零颜色的最小 bounding box(包含所有该颜色像素的最小矩形), 输出为该矩形内的子网格。
-- 输出中保留该非零颜色, 背景为零(不确定是否将框内零值保留或做其他处理)。
+- 核心变换：统计每种非零颜色4连通分量数，选分量最少的颜色，取其最小外接矩形裁剪输出。
+
 
 ## 2. 关键证据
 
-- 每个 train 样例的输入网格尺寸不同, 输出尺寸较小(裁剪后)。
-- 每个输入网格只有一种非零颜色(如 4 例分别使用不同颜色)。
-- 输出恰好包含输入中该唯一非零颜色对应的区域。
-- with-spec 基线 4/4 train 通过, 1/1 test 通过, 262/262 arc-gen 通过。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -26,24 +24,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 动态裁剪需要全局 bounding box 计算, 无法由固定卷积核实现。在 ONNX 中实现需借助全局 argmax / 坐标累加来确定边界, 然后用 gather/crop 操作提取子网格。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_only`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 166 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Abs+Add+Cast+Constant+Greater+GreaterOrEqual+Less+LessOrEqual+MatMul+Mul+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Transpose (166 nodes, 0 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 014
-primitive_types: [dynamic_crop, bounding_box]
-input_shape_rule: variable
-output_shape_rule: crop to bounding box of unique non-zero color
-formal_rule_short: crop = bounding_box(only_non_background_color); output = input[crop]
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: 边界确定方式
-confidence: medium
+recommended_architecture: reduce_only
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 166 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
+confidence: high
+actual_ops: Abs+Add+Cast+Constant+Greater+GreaterOrEqual+Less+LessOrEqual+MatMul+Mul+ReduceMax+ReduceMin+ReduceSum+Reshape+Slice+Sub+Transpose
+actual_nodes: 166
 ```

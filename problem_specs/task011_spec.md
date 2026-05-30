@@ -23,24 +23,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: single_1x1_conv
-- locality: 0
-- single_linear_conv_possible: probably
-- recommended_kernel: 1x1
-- nonlinearity_needed: no
-- 该任务可视为 9 块独立的逐像素颜色映射决定，1x1 conv 可通过对每个位置施加颜色表实现。灰线通道（5）直接恒等映射。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `yes`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 52 nodes: Cast+Conv+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Conv+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum (52 nodes, 22 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 011
-primitive_types: [color_selection_per_block, fill]
-input_shape_rule: 11x11
-output_shape_rule: 11x11
-formal_rule_short: for each 3x3 sub-block, fill with selected dominant non-zero color or 0
-locality: 0
-single_linear_conv_possible: probably
-recommended_architecture: single_1x1_conv
-main_risk: 平局打破规则不完全确定
-confidence: medium
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
+single_linear_conv_possible: no
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 52 nodes: Cast+Conv+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Conv+Mul+Pad+ReduceMax+Relu+Slice+Sub+Sum
+actual_nodes: 52
 ```

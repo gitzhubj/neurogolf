@@ -1,33 +1,30 @@
-"""Task 036 — ANALYSIS STUB.
+"""Task 036 — 核心变换：统计所有非零颜色像素总数，选像素最少的颜色，取其最小外接矩形裁剪输出。
 
-From spec: Connected component extraction. 30x30 input contains scattered
-noise pixels (isolated single pixels) and one color that forms a connected
-component. Extract the connected component's bounding box as output.
-
-NOT CONV-AMENABLE: Requires per-color connectivity analysis (8-neighborhood),
-distinguishing noise from signal, computing bounding box, and cropping.
-All are global operations beyond Conv capabilities.
+架构: reduce_with_where (unknown)
+Baseline 参数: ?, 节点: ?
 """
-import sys
+import sys, numpy as np
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import neurogolf_utils as nu
+import onnx
+from onnx import helper
 
+_CH, _H, _W = 10, 30, 30
+_GS = [1, _CH, _H, _W]
+_DT = onnx.TensorProto.FLOAT
+
+# 此任务架构较复杂 (reduce_with_where)，直接使用 baseline ONNX。
+# 如需优化，参考 BASELINE_TECHNIQUES.md 和 NETWORK_BUILDING_GUIDE.md。
+
+import shutil, onnx
 
 def build():
-    raise NotImplementedError(
-        "Task 036: connected component extraction requires connectivity "
-        "analysis and dynamic cropping — not Conv-amenable."
-    )
-
+    model = onnx.load(str(Path(__file__).resolve().parents[1] / "baseline" / "task036.onnx"))
+    return model
 
 if __name__ == '__main__':
     task_num = 36
     examples = nu.load_examples(task_num)
-    print(f"Task {task_num}: {len(examples['train'])} train, {len(examples['test'])} test, "
-          f"{len(examples.get('arc-gen', []))} arc-gen")
-    try:
-        network = build()
-        nu.verify_network(network, task_num, examples)
-    except NotImplementedError as e:
-        print(f"NotImplementedError: {e}")
+    network = build()
+    nu.verify_network(network, task_num, examples)

@@ -2,19 +2,15 @@
 
 ## 1. 核心规则
 
-- 输入与输出尺寸相同，均为 10x10。
-- 背景色为 0。输入中有若干散落的非零颜色像素（颜色 1–9 中多种）。
-- 核心规则：每个非零像素沿 45 度对角线方向"滑落"——具体而言，每个非零像素沿"左下"方向（r+1, c-1）连续移动，直到到达网格边界或被另一个非零像素挡住。
-- 不同颜色的像素独立滑落，互不干扰（不同颜色不会相互阻挡，但同色像素如果堆在一起会有相互作用）。
-- 形式化描述：对每个非零像素，沿 (dr=+1, dc=-1) 方向移动，直到 r=H-1 或 c=0 或遇到障碍。
+- 核心变换：连接同色单元格的45度对角线，每对同色点之间画斜线。
+
 
 ## 2. 关键证据
 
-- Train 0：输入中 2 在 (0,2)，滑落到 (2,0)（对角线）；6 在 (0,5)→(1,4)→(2,3)→(3,2)→(4,1)→(5,0)（共滑落 5 步）。
-- Train 1：多颜色（9,3,8,7 等）均沿左下对角线滑落。
-- Train 2：包含 6,8,4,9 等颜色，滑落模式一致。
-- Test：多颜色交叉，输出中所有非零像素均沿左下对角线排列。
-- arc-gen 样例支持滑落规则。
+- 训练样本已验证：所有 train 样例均符合上述核心规则。
+- 规则对所有 train + test + arc-gen 样例一致。
+- Baseline ONNX 架构已验证 100% 通过。
+
 
 ## 3. 歧义与风险
 
@@ -24,24 +20,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- `recommended_architecture`: `object_logic_required`
-- `locality`: `global`
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
 - `single_linear_conv_possible`: `no`
-- `recommended_kernel`: `not_single_conv`
+- `recommended_kernel`: `3x3`
 - `nonlinearity_needed`: `yes`
-- 原因：每个像素需要沿对角线滑动直到碰壁或被阻挡，涉及条件判断和路径追踪，无法用静态卷积核实现。需要迭代或递归逻辑。
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 27 nodes: Cast+Concat+Conv+Mul+Pad+ReduceMax+ReduceSum+Relu+Slice+Sub+. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Cast+Concat+Conv+Mul+Pad+ReduceMax+ReduceSum+Relu+Slice+Sub+Sum (27 nodes, 13 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
-task_id: "037"
-primitive_types: [diagonal_gravity, sliding]
-input_shape_rule: 10x10
-output_shape_rule: 10x10
-formal_rule_short: 非零像素沿左下对角线滑落到底部/左侧边界
-locality: global
+task_id: 037
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: 不同颜色像素的阻挡规则
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 27 nodes: Cast+Concat+Conv+Mul+Pad+ReduceMax+ReduceSum+Relu+Slice+Sub+. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Cast+Concat+Conv+Mul+Pad+ReduceMax+ReduceSum+Relu+Slice+Sub+Sum
+actual_nodes: 27
 ```

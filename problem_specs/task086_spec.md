@@ -25,23 +25,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需识别框结构 + 膨胀 + 颜色交换）
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 41 nodes: And+Cast+Conv+ConvTranspose+Div+Greater+Less+Mul+OneHot+Pad+. Study baseline for optimal op sequence.
+
+Baseline 实际架构: And+Cast+Conv+ConvTranspose+Div+Greater+Less+Mul+OneHot+Pad+ReduceSum+Slice+Squeeze+Sum+Where (41 nodes, 19 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 086
-primitive_types: [frame_dilation, color_swap, morphological_grow]
-input_shape_rule: same as output
-output_shape_rule: same as input
-formal_rule_short: dilate the frame by 1 layer, swap frame and interior colors (frame→center, interior→ring)
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: overlapping frames handling undefined
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 41 nodes: And+Cast+Conv+ConvTranspose+Div+Greater+Less+Mul+OneHot+Pad+. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: And+Cast+Conv+ConvTranspose+Div+Greater+Less+Mul+OneHot+Pad+ReduceSum+Slice+Squeeze+Sum+Where
+actual_nodes: 41
 ```

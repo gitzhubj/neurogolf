@@ -29,23 +29,33 @@ for each column c:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: object_logic_required（需要检测连通组件和物理仿真沉降）
-- locality: global（沉降需要知道整个列/块的障碍物分布）
-- single_linear_conv_possible: no（重力仿真无法用单层 Conv 表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（碰撞检测和沉降距离计算需要非线性）
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `reduce_with_where`
+- `locality`: `global`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `not_needed`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Reduce + threshold + conditional. No Conv needed.
+- `fusion_hint`: Baseline uses 56 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+
+Baseline 实际架构: Add+And+ArgMax+Cast+Concat+Gather+Greater+Less+Not+Or+ReduceSum+Reshape+Slice+Squeeze+Sub+Sum+Where (56 nodes, 13 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 030
-primitive_types: [gravity, object_falling, connected_component_preservation]
-input_shape_rule: same as output (H_in = H_out, W_in = W_out)
-output_shape_rule: same as input
-formal_rule_short: each colored connected block falls vertically until it hits bottom or another block, preserving shape and horizontal position
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
 locality: global
 single_linear_conv_possible: no
-recommended_architecture: object_logic_required
-main_risk: overlapping blocks priority rule untested
+recommended_architecture: reduce_with_where
+memory_priority: Reduce + threshold + conditional. No Conv needed.
+fusion_hint: Baseline uses 56 nodes. Key: ReduceSum/ReduceMax + Greater/Equal + Where.
+main_risk: medium — check baseline for exact op sequence
 confidence: high
+actual_ops: Add+And+ArgMax+Cast+Concat+Gather+Greater+Less+Not+Or+ReduceSum+Reshape+Slice+Squeeze+Sub+Sum+Where
+actual_nodes: 56
 ```

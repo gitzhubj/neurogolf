@@ -24,24 +24,33 @@
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: multi_layer_conv_relu
-- locality: global
-- single_linear_conv_possible: no
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes
-- 原因：需要先定位离散像素的坐标，然后广播到整行/整列。这需要全局信息（行/列广播）。1x1 Conv 无法实现行广播。
+> **以下内容已根据 baseline ONNX 验证方案修正**
+
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 395 nodes: Add+Cast+Concat+Conv+Greater+Less+Mul+Slice+Sub. Study baseline for optimal op sequence.
+
+Baseline 实际架构: Add+Cast+Concat+Conv+Greater+Less+Mul+Slice+Sub (395 nodes, 14 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 023
-primitive_types: [projection, row_fill, column_fill]
-input_shape_rule: variable, same as output
-output_shape_rule: same as input
-formal_rule_short: 对颜色 2 填列，对颜色 1/3 填行，行优先于列
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: multi_layer_conv_relu
-main_risk: 颜色-方向映射在新颜色上不确定
-confidence: medium
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 395 nodes: Add+Cast+Concat+Conv+Greater+Less+Mul+Slice+Sub. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
+confidence: high
+actual_ops: Add+Cast+Concat+Conv+Greater+Less+Mul+Slice+Sub
+actual_nodes: 395
 ```

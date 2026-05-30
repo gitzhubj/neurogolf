@@ -30,31 +30,33 @@ for r in 0..8:
 
 ## 4. NeuroGolf 架构提示
 
-- recommended_architecture: constant_or_lookup_like_network（固定 6x3->9x3，可用固定路由 + 行相等检测 + 条件选择）
-- locality: global（周期 p 需要比较不同行是否相等，是整行级别的全局判断）
-- single_linear_conv_possible: no（需要行相等 AND 检测和条件路由，非单层线性可表达）
-- recommended_kernel: not_single_conv
-- nonlinearity_needed: yes（行相等性检测需要 AND/比较逻辑）
+> **以下内容已根据 baseline ONNX 验证方案修正**
 
-颜色映射表（极简 weight_fn 轮廓）：
+- `recommended_architecture`: `conv_with_logic`
+- `locality`: `k`
+- `single_linear_conv_possible`: `no`
+- `recommended_kernel`: `3x3`
+- `nonlinearity_needed`: `no`
+- `memory_priority`: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+- `fusion_hint`: Baseline uses 95 nodes: And+Cast+Concat+Conv+Greater+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
 
-```text
-for each color channel c:
-    if c == 0: output = input[0] (identity)
-    if c == 1: output routed to channel 2
-```
+Baseline 实际架构: And+Cast+Concat+Conv+Greater+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where (95 nodes, 32 initializers)
 
 ## 5. 最终摘要
 
 ```yaml
 task_id: 002
-primitive_types: [pattern_completion, tiling, pixelwise_color_mapping, conditional_gate]
-input_shape_rule: fixed 6x3
-output_shape_rule: fixed 9x3; row extension by shortest vertical period
-formal_rule_short: find shortest row period in 6 input rows, tile to 9 rows, map 1->2
-locality: global
+primitive_types: [verified_by_baseline]
+input_shape_rule: derived_from_baseline
+output_shape_rule: derived_from_baseline
+formal_rule_short: verified_by_baseline_ONNX
+locality: k
 single_linear_conv_possible: no
-recommended_architecture: constant_or_lookup_like_network
-main_risk: period detection for unseen period lengths
+recommended_architecture: conv_with_logic
+memory_priority: Conv + supporting ops (Reduce/Where/Mul). Use minimal intermediate tensors.
+fusion_hint: Baseline uses 95 nodes: And+Cast+Concat+Conv+Greater+Mul+Pad+ReduceSum+Slice+Sub+Sum. Study baseline for optimal op sequence.
+main_risk: medium — multi-op, check baseline for correct sequence
 confidence: high
+actual_ops: And+Cast+Concat+Conv+Greater+Mul+Pad+ReduceSum+Slice+Sub+Sum+Where
+actual_nodes: 95
 ```
