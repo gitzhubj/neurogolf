@@ -74,6 +74,7 @@ Contributors from the Kaggle Community:
 import itertools
 import json
 import math
+import os
 import pathlib
 import traceback
 
@@ -502,7 +503,8 @@ def verify_network(network, task_num, examples):
     options = onnxruntime.SessionOptions()
     options.enable_profiling = True
     options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
-    options.profile_file_prefix = f"{task_num:03}"
+    os.makedirs("profiler_traces", exist_ok=True)
+    options.profile_file_prefix = f"profiler_traces{os.sep}{task_num:03}"
     session = onnxruntime.InferenceSession(sanitized.SerializeToString(), options)
   except onnxruntime.ONNXRuntimeError as e:
     print(f"Error: Unable to load ONNX model: {e}")
