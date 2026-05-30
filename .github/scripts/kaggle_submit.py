@@ -6,6 +6,7 @@ import argparse
 import subprocess
 import tempfile
 import shutil
+import zipfile
 from pathlib import Path
 
 
@@ -63,7 +64,11 @@ def main():
             return
 
         zip_path = tmpdir / 'submission.zip'
-        shutil.make_archive(str(zip_path.with_suffix('')), 'zip', tmpdir)
+        # Use zipfile directly to enable ZIP64 for large submissions
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED, allowZip64=True) as zf:
+            for f in files_to_pack:
+                zf.write(tmpdir / f, f)
+        print(f"Packed {len(files_to_pack)} files, {zip_path.stat().st_size / 1024:.0f} KB")
 
         if args.dry_run:
             print(f"[DRY RUN] competition: {args.competition}")
